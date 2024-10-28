@@ -1,0 +1,54 @@
+name: Deploy Django Admin Application
+'on':
+  workflow_dispatch: {}
+env:
+  # Secrets
+  HOST: '${{ secrets.HOST }}'
+  USERNAME: '${{ secrets.USERNAME }}'
+  PASSWORD: '${{ secrets.PASSWORD }}'
+  DJANGO_ADMIN_DB_PASSWORD: '${{ secrets.DJANGO_ADMIN_DB_PASSWORD }}'
+  REMOTE_DJANGO_DIRECTORY: '${{ secrets.REMOTE_DJANGO_DIRECTORY }}'
+
+  # Variables
+  MODE: prod
+
+jobs:
+  deploy:
+    name: Deploying Django application
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout the repository to the runner
+        uses: actions/checkout@v2
+
+      - name: Create ssh directory
+        run: mkdir ~/.ssh
+
+      - name: Add ssh known hosts
+        run: ssh-keyscan $HOST >> ~/.ssh/known_hosts
+
+      - name: Copy contents of password to SSH key
+        run: echo "$PASSWORD" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && chmod 700 ~/.ssh
+
+
+      - name: Generate env file
+        run: |
+          echo "MODE=$MODE" > .env
+          echo "DJANGO_ADMIN_DB_PORT=${{ vars.DJANGO_ADMIN_DB_PORT }}" >> .env
+          echo "DJANGO_ADMIN_DB_HOST=${{ vars.DJANGO_ADMIN_DB_HOST }}" >> .env
+          echo "DJANGO_ADMIN_DB_NAME=${{ vars.DJANGO_ADMIN_DB_NAME }}" >> .env
+          echo "DJANGO_ADMIN_DB_USER=${{ vars.DJANGO_ADMIN_DB_USER }}" >> .env
+          echo "DJANGO_ADMIN_DB_PASSWORD=$DJANGO_ADMIN_DB_PASSWORD" >> .env
+
+          echo "DJANGO_ADMIN_LOCAL_PORT=${{ vars.DJANGO_ADMIN_LOCAL_PORT }}" >> .env
+          echo "DJANGO_ADMIN_HOST_PORT=${{ vars.DJANGO_ADMIN_HOST_PORT }}" >> .env
+          echo "DJANGO_ADMIN_SERVICE_SECRET_KEY=${{ vars.DJANGO_ADMIN_SERVICE_SECRET_KEY }}" >> .env
+          echo "DJANGO_ADMIN_SERVICE_ALLOWED_HOSTS=${{ vars.DJANGO_ADMIN_SERVICE_ALLOWED_HOSTS }}" >> .env
+          echo "DJANGO_ADMIN_CSRF_TRUSTED_ORIGIN=${{ vars.DJANGO_ADMIN_CSRF_TRUSTED_ORIGIN }}" >> .env
+          cat .env
+
+      - name: Deploy Resource Management Application
+        run: |
+          chmod +x build-tools/deployment.sh && ./build-tools/deployment.sh -m $MODE -i $HOST -u $USERNAME -s ~/.ssh/id_rsa -c django_admin -d $(pwd) -a portfolio_django_admin -r "$REMOTE_DJANGO_DIRECTORY"
