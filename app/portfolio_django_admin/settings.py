@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+# from portfolio_django_admin import constants as constants
+import portfolio_django_admin.constants as constants
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,8 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "daphne",
     'django.contrib.staticfiles',
-    "graphene_django",
     'portfolio_django_admin',
     'github',
 ]
@@ -75,6 +79,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'portfolio_django_admin.wsgi.application'
+ASGI_APPLICATION = 'portfolio_django_admin.asgi.application'
 
 
 # Database
@@ -157,9 +162,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# GraphQL
-GRAPHENE = {
-    "SCHEMA": "github.schema.schema"
-}
