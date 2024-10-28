@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:  
+  django_admin:
+    build: .
+    container_name: myportfolio-djangoadmin
+    command: python manage.py runserver 0.0.0.0:${DJANGO_ADMIN_LOCAL_PORT}
+    volumes:
+      - ./app:/app
+    ports:
+      - "${DJANGO_ADMIN_HOST_PORT}:${DJANGO_ADMIN_LOCAL_PORT}"
+      - 3000:4000
+
+    networks:
+      - platform_net
+
+    environment:
+      - POSTGRES_DB=${DJANGO_ADMIN_DB_NAME}
+      - POSTGRES_USER=${DJANGO_ADMIN_DB_USER}
+      - POSTGRES_PASSWORD=${DJANGO_ADMIN_DB_PASSWORD}
+      - POSTGRES_HOST=${DJANGO_ADMIN_DB_HOST}
+      - POSTGRES_PORT=${DJANGO_ADMIN_DB_PORT}
+
+      - DEBUG=${DJANGO_ADMIN_DEBUG}
+      - SECRET_KEY=${DJANGO_ADMIN_SERVICE_SECRET_KEY}
+      - ALLOWED_HOSTS=${DJANGO_ADMIN_SERVICE_ALLOWED_HOSTS}
+      - TRUSTED_ORIGINS=${DJANGO_ADMIN_CSRF_TRUSTED_ORIGIN}
+
+networks:
+  platform_net:
+    driver: bridge
+    name: my-portfolio-network
+    external: true
