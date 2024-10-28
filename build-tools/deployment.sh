@@ -73,7 +73,7 @@ echo "Deploying application to server $server"
 
 # 1. If resource_management folder exists then stop the docker compose
 echo "Stopping the docker container"
-# ssh -i $ssh_key $server "if [ -d $application_directory ]; then cd $application_directory && docker compose down; else echo 'The application directory does not exist. Not stopping the container'; fi"
+ssh -i $ssh_key $server "if [ -d $application_directory ]; then cd $application_directory && docker compose down; else echo 'The application directory does not exist. Not stopping the container'; fi"
 
 # 2. Install rsync and zip  in current server. Create a zip file with timestamp as name using rsync with all contents except those of .gitignore
 # echo "Installing rsync and zip"
@@ -115,15 +115,15 @@ ssh -i $ssh_key $server "mv $remote_server_application_directory/docker-compose.
 
 # 8. Run migration and collectstatic for django application through docker compose
 echo "Running migration and collectstatic for django application"
-# ssh -i $ssh_key $server "cd $remote_server_application_directory && docker compose run --rm $docker_container python manage.py migrate && docker compose run --rm $docker_container python manage.py collectstatic --noinput"
+ssh -i $ssh_key $server "cd $remote_server_application_directory && docker compose run --rm $docker_container python manage.py migrate && docker compose run --rm $docker_container python manage.py collectstatic --noinput"
 
 # 9. Change permission of staticfiles to publicly accessible
 echo "Changing permission of staticfiles to publicly accessible"
-# ssh -i $ssh_key $server "sudo chmod -R 775 $remote_server_application_directory/staticfiles"
+ssh -i $ssh_key $server "sudo chmod -R 775 $remote_server_application_directory/staticfiles"
 
 # 9. Start the docker container in application directory
 echo "Starting the docker container"
-# ssh -i $ssh_key $server "cd $remote_server_application_directory && docker compose up -d"
+ssh -i $ssh_key $server "cd $remote_server_application_directory && docker compose up -d"
 
 
 
