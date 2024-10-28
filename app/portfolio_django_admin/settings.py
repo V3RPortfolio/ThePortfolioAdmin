@@ -27,7 +27,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', '')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-CSRF_TRUSTED_ORIGINS = os.getenv('TRUSTED_ORIGINS', '').split(',')
+origins = os.getenv('TRUSTED_ORIGINS', '').split(',')
+
+if origins and len(origins) > 0 and origins[0] != '':
+    CSRF_TRUSTED_ORIGINS = origins
 
 # Application definition
 
@@ -38,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "graphene_django",
     'portfolio_django_admin',
+    'github',
 ]
 
 MIDDLEWARE = [
@@ -152,3 +157,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# GraphQL
+GRAPHENE = {
+    "SCHEMA": "github.schema.schema"
+}
