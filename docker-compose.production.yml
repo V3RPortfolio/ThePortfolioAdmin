@@ -28,6 +28,10 @@ services:
 
       - GITHUB_PAT=${GITHUB_PAT}
 
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
 networks:
   platform_net:
     driver: bridge

@@ -1,35 +1,32 @@
 import github.services.github_service as github_service
+import portfolio_django_admin.constants as constants
+import github.types as github_types
 
 import typing
 import strawberry
 
 
-@strawberry.type
-class Book:
-    title: str
-    author: str
 
 
 @strawberry.type
 class Query:
-    books: typing.List[Book]
+    
+    @strawberry.field
+    async def issue_counts(self)->typing.List[github_types.GithubIssueCount]:
+        """
+        Retrieves the issues from the Github REST API.
+        """
+        async with github_service.GithubRestApiService() as service:
+            repositories = service.get_all_repository_names()
+            issues = []
+            for repository in repositories:
+                result = await service.get_issue_count(repository)
+                if not result or type(result) is not dict:
+                    continue
 
-
-async def get_books():
-    async with github_service.GithubRestApiService() as service:
-        result = await service.get_completed_pull_requests("portfolio_admin_experience_django")
-        print(result)
-    return [
-        Book(
-            title="The Great Gatsby",
-            author="F. Scott Fitzgerald",
-        ),
-    ]
-
-
-@strawberry.type
-class Query:
-    books: typing.List[Book] = strawberry.field(resolver=get_books)
+                issues.append(github_types.GithubIssueCount.from_dict(result))
+            return issues
+        
 
 
 schema = strawberry.Schema(query=Query)
