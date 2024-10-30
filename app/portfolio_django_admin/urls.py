@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from portfolio_django_admin.views import index
+from portfolio_django_admin.views import index, csrf
 
 urlpatterns = [
     path('', index, name='home'),
     path('admin/', admin.site.urls, name='admin'),
+    path('csrf/', csrf, name='csrf'),
     path('github/', include('github.urls')),
 ]
