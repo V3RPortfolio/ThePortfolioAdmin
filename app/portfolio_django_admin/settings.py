@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+# from portfolio_django_admin import constants as constants
+import portfolio_django_admin.constants as constants
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +31,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', '')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-CSRF_TRUSTED_ORIGINS = os.getenv('TRUSTED_ORIGINS', '').split(',')
+origins = os.getenv('TRUSTED_ORIGINS', '').split(',')
+
+if origins and len(origins) > 0 and origins[0] != '':
+    CSRF_TRUSTED_ORIGINS = origins
 
 # Application definition
 
@@ -37,8 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "daphne",
     'django.contrib.staticfiles',
     'portfolio_django_admin',
+    'github',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +79,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'portfolio_django_admin.wsgi.application'
+ASGI_APPLICATION = 'portfolio_django_admin.asgi.application'
 
 
 # Database
@@ -152,3 +162,28 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Cache
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+REDIS_USERNAME = os.getenv('REDIS_USERNAME', 'redis')
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'redis')
+REDIS_PATH = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+
+
+# Redis
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"{REDIS_PATH}/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": REDIS_PASSWORD,
+        }
+    }
+}
+
+# Optional: This is to ensure Django sessions are stored in Redis
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'

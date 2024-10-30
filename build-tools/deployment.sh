@@ -123,7 +123,7 @@ ssh -i $ssh_key $server "sudo chmod -R 775 $remote_server_application_directory/
 
 # 9. Start the docker container in application directory
 echo "Starting the docker container"
-ssh -i $ssh_key $server "cd $remote_server_application_directory && docker compose up -d"
+ssh -i $ssh_key $server "cd $remote_server_application_directory && docker compose up --build -d"
 
 
 
