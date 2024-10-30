@@ -36,6 +36,8 @@ origins = os.getenv('TRUSTED_ORIGINS', '').split(',')
 if origins and len(origins) > 0 and origins[0] != '':
     CSRF_TRUSTED_ORIGINS = origins
 
+    CORS_ALLOWED_ORIGINS = origins
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,7 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     "daphne",
+    
     'django.contrib.staticfiles',
+    'corsheaders',
     'portfolio_django_admin',
     'github',
 ]
@@ -53,6 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

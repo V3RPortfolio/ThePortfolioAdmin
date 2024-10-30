@@ -1,5 +1,9 @@
+from typing import List
 import httpx
 import portfolio_django_admin.constants as constants
+import github.models as models
+
+
 class GithubRestApiService:
     """
     This service retrieves and extracts data from the Github REST API.
@@ -23,20 +27,41 @@ class GithubRestApiService:
             self.http_client.aclose()
 
 
-    def get_all_repository_names(self)->str:
+    def get_all_repository_names(self)->List[models.GithubRepository]:
         """
         Retrieves the repositories from the Github REST API.
+        Note: Move it to the database later.
         """
         return [
-            constants.GITHUB_REPOSITORY_FRONTEND,
-            constants.GITHUB_REPOSITORY_CMS,
-            constants.GITHUB_REPOSITORY_INFRASTRUCTURE,
-            constants.GITHUB_REPOSITORY_ADMIN
+            models.GithubRepository(
+                name=constants.GITHUB_REPOSITORY_FRONTEND,
+                title="The Angular Frontend",
+                description="The Angular Frontend for the system",
+                url="https://github.com/zuhairmhtb/ThePortfolioFrontend.git"
+            ),
+            models.GithubRepository(
+                name=constants.GITHUB_REPOSITORY_CMS,
+                title="The WordPress Backend",
+                description="The WordPress CMS for the system",
+                url="https://github.com/zuhairmhtb/ThePortfolioCMS.git"
+            ),
+            models.GithubRepository(
+                name=constants.GITHUB_REPOSITORY_INFRASTRUCTURE,
+                title="The Infrastructure",
+                description="The Infrastructure for the system",
+                url="https://github.com/zuhairmhtb/ThePortfolioInfrastructure.git"
+            ),
+            models.GithubRepository(
+                name=constants.GITHUB_REPOSITORY_ADMIN,
+                title="The Django Admin",
+                description="The Django Admin for the system",
+                url="https://github.com/zuhairmhtb/ThePortfolioAdmin.git"
+            )
         ]
     
 
-    async def get_issue_count(self, repository_name:str)->dict:
-        query = f"""query ($owner: String = "{self.github_owner}", $name: String = "{repository_name}") {{
+    async def get_issue_count(self, repository:models.GithubRepository)->dict:
+        query = f"""query ($owner: String = "{self.github_owner}", $name: String = "{repository.name}") {{
   repository(owner: $owner, name: $name) {{
     all:issues {{
       totalCount
@@ -56,7 +81,12 @@ class GithubRestApiService:
             issue_info['all'] = result["data"]["repository"]["all"]["totalCount"]
             issue_info['closed'] = result["data"]["repository"]["closed"]["totalCount"]
             issue_info['open'] = result["data"]["repository"]["open"]["totalCount"]
-            issue_info["repository"] = repository_name
+            issue_info["repository"] = repository.name
+            issue_info["title"] = repository.title
+            issue_info["description"] = repository.description
+            issue_info["icon"] = repository.icon
+            issue_info["url"] = repository.url
+
             
         return issue_info
         

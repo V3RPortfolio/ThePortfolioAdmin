@@ -1,6 +1,6 @@
 import github.services.github_service as github_service
-import portfolio_django_admin.constants as constants
 import github.types as github_types
+from github.models import GithubRepository
 
 import typing
 import strawberry
@@ -17,7 +17,7 @@ class Query:
         Retrieves the issues from the Github REST API.
         """
         async with github_service.GithubRestApiService() as service:
-            repositories = service.get_all_repository_names()
+            repositories:typing.List[GithubRepository] = service.get_all_repository_names()
             issues = []
             for repository in repositories:
                 result = await service.get_issue_count(repository)

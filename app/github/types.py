@@ -111,9 +111,13 @@ class GithubIssue:
 @strawberry.type
 class GithubIssueCount:
     repository:str
+    url: str
     all:int
     closed:int
     open:int
+    title:typing.Optional[str]
+    description:typing.Optional[str]
+    icon:typing.Optional[str]
 
     @staticmethod
     def from_dict(data:dict):
@@ -124,5 +128,9 @@ class GithubIssueCount:
             repository=data.get("repository", ""),
             all=data.get("all", 0),
             closed=data.get("closed", 0),
-            open=data.get("open", 0)
+            open=data.get("open", 0),
+            title=data.get("title", ""),
+            description=data.get("description", ""),
+            icon=data.get("icon", ""),
+            url=data.get("url", "")
         )
