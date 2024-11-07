@@ -39,7 +39,7 @@ if origins and len(origins) > 0 and origins[0] != '':
     CORS_ALLOWED_ORIGINS = origins
 
 CORS_ALLOW_CREDENTIALS = True
-CSRF_COOKIE_SAMESITE = 'LAX'
+CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = not DEBUG
 
 # CSRF_COOKIE_HTTPONLY=True
