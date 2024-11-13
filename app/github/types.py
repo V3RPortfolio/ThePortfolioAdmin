@@ -134,3 +134,15 @@ class GithubIssueCount:
             icon=data.get("icon", ""),
             url=data.get("url", "")
         )
+    
+    def to_dict(self)->dict:
+        return {
+            "repository": self.repository,
+            "all": self.all,
+            "closed": self.closed,
+            "open": self.open,
+            "title": self.title,
+            "description": self.description,
+            "icon": self.icon,
+            "url": self.url
+        }
