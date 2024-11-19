@@ -1,7 +1,7 @@
 # Resource Management Service
 
 
-## Create a Django application within Docker.
+## 1.0 Create a Django application within Docker.
 
 1. Create a new folder in services/ where the Django application will reside. Let the name of the service is 'email_service'. So, the base directory will be services/email_service
 
@@ -19,6 +19,106 @@ docker-compose run email_service django-admin startproject email_service /app
 
 6. Rerun the docker compose file and start the application.
 
+
+## 2.0 Manage collections in Weaviate
+
+This section contains different code snippets to manage data in Weaviate database.
+
+### 2.1 Create Post collection
+
+This collection contains different wordpress posts. The collection can be managed using the GraphQL api in the dashboard app.
+
+**Sample request**
+
+```
+mutation MyMutation {
+  dataset {
+    add(
+      dataset: {
+        name: "Post", 
+        description: "Cotains post", 
+        properties: [
+          {
+            name: "postId", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: false, 
+            description: "Wordpess ID"
+          },
+          {
+            name: "postTitle", 
+            type: "text", 
+            isVector: true, 
+            isIndexed: false, 
+            description: "Wordpess title"
+          },
+          {
+            name: "postExcerpt", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: false, 
+            description: "Wordpess post excerpt"
+          },
+          {
+            name: "postContent", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: false, 
+            description: "Wordpess post content"
+          },
+          {
+            name: "postDate", 
+            type: "date", 
+            isVector: false, 
+            isIndexed: true, 
+            description: "Wordpess post publish date"
+          },
+          {
+            name: "postAuthor", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: true, 
+            description: "Wordpess post author"
+          },
+          {
+            name: "postCategories", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: false, 
+            description: "Wordpess post category names"
+          },
+          {
+            name: "postTags", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: false, 
+            description: "Wordpess post tags"
+          },
+          {
+            name: "postUrl", 
+            type: "text", 
+            isVector: false, 
+            isIndexed: false, 
+            description: "Wordpess post url"
+          }
+        ]
+      }
+    ) {
+      description
+      id
+      name
+      properties {
+        description
+        id
+        isIndexed
+        isVector
+        name
+        type
+      }
+    }
+  }
+}
+```
 
 
 ## References
