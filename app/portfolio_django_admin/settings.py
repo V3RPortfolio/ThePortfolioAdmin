@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'portfolio_django_admin',
     'github',
+    'dashboard'
 ]
 
 MIDDLEWARE = [
@@ -206,6 +207,15 @@ CACHES = {
         }
     }
 }
+
+# Weaviate
+WEAVIATE_HOST=os.getenv('WEAVIATE_HOST', 'http://localhost:8080')
+WEAVIATE_PORT=os.getenv('WEAVIATE_PORT', '8080')
+WEAVIATE_SCHEME=os.getenv('WEAVIATE_SCHEME', 'http')
+WEAVIATE_GRPC_PORT=os.getenv('WEAVIATE_GRPC_PORT', '8081')
+WEAVIATE_TIMEOUT=os.getenv('WEAVIATE_TIMEOUT', '5')
+WEAVIATE_TOKEN=os.getenv('WEAVIATE_TOKEN', '')
+WEAVIATE_USER=os.getenv('WEAVIATE_USER', '')
 
 # Optional: This is to ensure Django sessions are stored in Redis
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'

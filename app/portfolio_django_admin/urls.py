@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('csrf/', csrf, name='csrf'),
     path('github/', include('github.urls')),
+    path('dashboard/', include('dashboard.urls')),
 ]
