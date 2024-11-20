@@ -1,9 +1,11 @@
 from django.conf import settings
+import portfolio_django_admin.constants as constants
 import weaviate
 from weaviate.connect import ConnectionParams
 from weaviate.classes.init import AdditionalConfig, Timeout, Auth
 from weaviate.classes.config import Property, DataType, Configure, VectorDistances
-
+from weaviate.classes.query import Filter
+import re
 
 
 from typing import List, Optional, Type
@@ -19,6 +21,8 @@ class WeaviateService:
         self.weaviate_timeout = settings.WEAVIATE_TIMEOUT
         self.weaviate_token = settings.WEAVIATE_TOKEN
         self.weaviate_user = settings.WEAVIATE_USER
+        self.max_words_per_post = constants.WEAVIATE_MAX_WORD_PER_POST
+        self.weaviate_post_collection = constants.WEAVIATE_POST_COLLECTION
 
         self.client = self._get_async_client()
 
@@ -159,3 +163,100 @@ class WeaviateService:
         except Exception as e:
             print(f"Error deleting collection: {e}")
         return None
+    
+    def _create_chunks_for_post(self, content:str)->List[str]:
+        """
+        Splits a post content into multiple chunks maintaining a sequence
+        @param content: The content of the post
+        """
+        result = []
+        current_char_index = 0
+        last_sentence_ended_at = -1
+        last_chunk_ended_at = 0
+        current_word_count = 0
+        
+        while current_char_index < len(content) + 1:
+            current_char = content[current_char_index] if current_char_index < len(content) else ''
+            
+            if bool(re.match(r'\s', current_char)): # Increase word count if a whitespace occurs
+                current_word_count += 1
+            elif current_char == '.': # Store where the last sentence ended
+                last_sentence_ended_at = current_char_index
+
+            # If the max word limit has been reached
+            if current_char_index == len(content): # This is the last iteration. So add the entire chunk
+                result.append(content[last_chunk_ended_at:current_char_index])
+                break
+                
+            elif current_word_count >= self.max_words_per_post: # The maximum word count has been reached
+                result.append(content[last_chunk_ended_at:last_sentence_ended_at] + ".") # Update the chunk      
+                
+                current_word_count = 0 # Reset the word count
+                last_chunk_ended_at = last_sentence_ended_at # The next chunk will start from where the current chunk was made
+                current_char_index = last_sentence_ended_at + 1 # Go back to where the last chunk ended
+            else:          
+                current_char_index += 1
+        return result
+    
+
+    async def synchronize_posts(self, posts:List[dashboard_types.Post])->List[dashboard_types.Post]:
+        """
+        Updates or adds the posts in weaviate
+        1. Extract all the post ids
+        2. Update all posts in the weaviate collection that matches the post ID and mark it as deleted
+        3. Split each post into multiple chunks with sequence number and add them to weaviate.
+        4. Fetch all posts from weaviate that are marked as deleted and delete them
+        @param posts: List of posts to be synchronized
+        """
+        if not posts or len(posts) == 0:
+            return []
+        
+        try:
+            collection = self.client.collections.get(self.weaviate_post_collection)
+            if not collection or not await collection.exists():
+                return []
+
+            # Update all posts in the weaviate collection that matches the post ID and mark it as deleted
+            unique_post_ids = set([post.postId for post in posts])    
+            stale_post_ids = []
+            for post_id in unique_post_ids:
+                existing_posts = await collection.query.fetch_objects(
+                    filters=Filter.by_property("postId").equal(str(post_id)),
+                )
+                stale_post_ids.extend([existing_post.uuid for existing_post in existing_posts.objects])
+
+            stale_post_ids = list(set(stale_post_ids))
+            # Split each post into multiple chunks with sequence number and add them to weaviate.
+            for post in posts:
+                chunks = self._create_chunks_for_post(post.postContent)
+                post_properties = dashboard_types.Post.to_dict(post)
+                del post_properties["id"]
+                for index, chunk in enumerate(chunks):
+                    post_properties["postContent"] = chunk
+                    post_properties["postSequence"] = index + 1
+                    post_properties["isDeleted"] = False
+                    
+
+                    await collection.data.insert(
+                        properties=post_properties,
+                        vector=dashboard_types.Post.from_dict(post_properties).get_embedding()
+                    )
+
+            # Fetch all posts from weaviate that are marked as deleted and delete them
+            await collection.data.delete_many(
+                where=Filter.any_of([Filter.by_id().equal(i) for i in stale_post_ids])
+            )
+
+            result = []
+            for post_id in unique_post_ids:
+                existing_posts = await collection.query.fetch_objects(
+                    filters=Filter.by_property("postId").equal(str(post_id)),
+                )
+                for existing_post in existing_posts.objects:
+                    result.append(dashboard_types.Post.from_dict(existing_post.properties))
+            return result
+
+            
+        except Exception as e:
+            print(f"Error updating posts: {e}")
+            return []

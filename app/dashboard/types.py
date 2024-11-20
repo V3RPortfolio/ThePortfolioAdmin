@@ -164,12 +164,14 @@ class Post(WeaviateCollection):
     postCategories:typing.Optional[str]
     postTags:typing.Optional[str]
     postUrl:typing.Optional[str]
+    postSequence:typing.Optional[int]=1
+    isDeleted:typing.Optional[bool]=False
 
     @staticmethod
     def to_dict(post):
         return {
             "id": post.id,
-            "postId": post.postId,
+            "postId": str(post.postId),
             "postTitle": post.postTitle,
             "postExcerpt": post.postExcerpt,
             "postContent": post.postContent,
@@ -177,7 +179,9 @@ class Post(WeaviateCollection):
             "postAuthor": post.postAuthor,
             "postCategories": post.postCategories,
             "postTags": post.postTags,
-            "postUrl": post.postUrl
+            "postUrl": post.postUrl,
+            "postSequence": post.postSequence,
+            "isDeleted": post.isDeleted
         }
     
     @staticmethod
@@ -195,7 +199,9 @@ class Post(WeaviateCollection):
             postAuthor=data.get("postAuthor", ""),
             postCategories=data.get("postCategories", ""),
             postTags=data.get("postTags", ""),
-            postUrl=data.get("postUrl", "")
+            postUrl=data.get("postUrl", ""),
+            postSequence=data.get("postSequence", 1),
+            isDeleted=data.get("isDeleted", False)
         )
     
     @staticmethod
@@ -209,9 +215,11 @@ class Post(WeaviateCollection):
             'postAuthor': 'author',
             'postCategories': 'categories',
             'postTags': 'tags',
-            'postUrl': 'link'
+            'postUrl': 'link',
+            'postSequence': 'sequence',
+            'isDeleted': 'isDeleted'
         }
     
     def get_embedding(self):
-        return []
+        return [0.12345] * 1536
     

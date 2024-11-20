@@ -42,7 +42,7 @@ mutation MyMutation {
             name: "postId", 
             type: "text", 
             isVector: false, 
-            isIndexed: false, 
+            isIndexed: true, 
             description: "Wordpess ID"
           },
           {
@@ -100,7 +100,21 @@ mutation MyMutation {
             isVector: false, 
             isIndexed: false, 
             description: "Wordpess post url"
-          }
+          },
+          {
+            name: "postSequence",
+            type: "integer",
+            isVector: false,
+            isIndexed: true,
+            description: "Sequence number of the post chunk"
+          },
+          {
+            name: "isDeleted",
+            type: "boolean",
+            isVector: false,
+            isIndexed: true,
+            description: "Whether this is marked as deleted"
+          },
         ]
       }
     ) {

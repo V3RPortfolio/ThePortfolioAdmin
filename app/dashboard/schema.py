@@ -66,6 +66,27 @@ class DatasetMutation:
             ))
         
 
+@strawberry.type
+class PostMutation:
+
+    @strawberry.mutation
+    async def synchronize(self, info:strawberry.Info, modified_date:str)->typing.List[dashboard_types.Post]:
+        """
+        Synchronize posts from wordpress rest api to Weaviate.
+        """
+        try:
+            modified_date = datetime.fromisoformat(modified_date)
+        except ValueError:
+            return []
+        
+        async with WordpressApiService() as service:
+            posts = await service.get_posts(modified_date=modified_date)
+            if len(posts) == 0:
+                return []
+            
+            async with WeaviateService() as weaviate_service:
+                return await weaviate_service.synchronize_posts(posts)
+        return []
 
 @strawberry.type
 class Mutation:
@@ -73,5 +94,9 @@ class Mutation:
     @strawberry.field
     async def dataset(self)->DatasetMutation:
         return DatasetMutation()
+    
+    @strawberry.field
+    async def posts(self)->PostMutation:
+        return PostMutation()
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

@@ -5,6 +5,8 @@ import base64
 import typing
 from datetime import datetime
 import asyncio
+from bs4 import BeautifulSoup
+import re
 
 class PaginatedResponse:
     def __init__(self, data:typing.List[dict], total:int=0, total_pages:int=1, page:int=1, per_page:int=10):
@@ -166,6 +168,28 @@ class WordpressApiService:
         return names
     
 
+    def clean_html_content(self, html_content:str)->str:
+        """
+        Cleans HTML content (like content and excerpt). Keeps only the formatted text
+        @param html_content: str - The html content
+        """
+        soup = BeautifulSoup(html_content, 'html.parser')
+    
+        # Remove all tags except anchor tags and images
+        for tag in soup.find_all(True):
+            if tag.name != 'a' and tag.name != 'img':
+                tag.unwrap()
+        
+        # Extract the remaining text and anchor tags
+        result = soup.get_text()    
+        # Replace multiple newlines with one newline
+        result = re.sub(r'\n+', '\n', result)
+        # Replace multiple spaces with one space
+        result = re.sub(r' +', ' ', result)
+
+        return result
+    
+
     async def wordpress_to_post_object(self, post:dict)->dashboard_types.Post:
         """
         Converts a Wordpress Post to a Post Object
@@ -193,9 +217,10 @@ class WordpressApiService:
         mapped_post = {}
         for system_key, wordpress_key in field_mappings.items():
 
-            if post[wordpress_key]:
+            if wordpress_key in post:
                 if wordpress_key == "excerpt" or wordpress_key == "content" or wordpress_key == "title": # The html content of content and excerpt exists inside rendered
                     mapped_post[system_key] = post[wordpress_key]["rendered"] if post[wordpress_key]["rendered"] else str(post[wordpress_key])
+                    mapped_post[system_key] = self.clean_html_content(mapped_post[system_key])
                 elif wordpress_key == "date_gmt": # convert it to datetime from iso string
                     try:
                         mapped_post[system_key] = datetime.fromisoformat(post[wordpress_key])
