@@ -141,6 +141,15 @@ class WeaviateCollection(ABC):
     @abstractmethod
     def to_dict(data:typing.Any)->dict:
         pass
+
+    @abstractmethod
+    def get_embedding(self)->typing.List[float]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def get_field_mapping()->dict:
+        pass
     
 
 @strawberry.type
@@ -188,3 +197,21 @@ class Post(WeaviateCollection):
             postTags=data.get("postTags", ""),
             postUrl=data.get("postUrl", "")
         )
+    
+    @staticmethod
+    def get_field_mapping()->dict:
+        return {
+            'postId': 'id',
+            'postTitle': 'title',
+            'postExcerpt': 'excerpt',
+            'postContent': 'content',
+            'postDate': 'date_gmt',
+            'postAuthor': 'author',
+            'postCategories': 'categories',
+            'postTags': 'tags',
+            'postUrl': 'link'
+        }
+    
+    def get_embedding(self):
+        return []
+    

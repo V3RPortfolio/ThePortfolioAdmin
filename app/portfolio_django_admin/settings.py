@@ -217,6 +217,11 @@ WEAVIATE_TIMEOUT=os.getenv('WEAVIATE_TIMEOUT', '5')
 WEAVIATE_TOKEN=os.getenv('WEAVIATE_TOKEN', '')
 WEAVIATE_USER=os.getenv('WEAVIATE_USER', '')
 
+# Wordpress
+WORDPRESS_BACKEND=os.getenv('WORDPRESS_BACKEND', 'http://localhost:8080')
+WORDPRESS_KEY=os.getenv('WORDPRESS_KEY', '')
+WORDPRESS_USER=os.getenv('WORDPRESS_USER', '')
+
 # Optional: This is to ensure Django sessions are stored in Redis
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'

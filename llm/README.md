@@ -73,13 +73,13 @@ A post belongs to one root category and one or more sub-categories. A **root** c
 
 **Endpoints:**
 
-- List categories: [https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/categories](https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/categories)
+- List categories: [https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/categories](https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/categories)
 
 **Sample request:**
 ```
 import requests
 
-url = "https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/categories"
+url = "https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/categories"
 
 payload={}
 headers = {
@@ -152,14 +152,14 @@ print(response.text)
 ]
 ```
 
-- Category Detail: [https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/categories/{category_id}](https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/categories/2)
+- Category Detail: [https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/categories/{category_id}](https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/categories/2)
 
 **Sample request:**
 
 ```
 import requests
 category_id=2
-url = f"https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/categories/{category_id}"
+url = f"https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/categories/{category_id}"
 
 payload={}
 headers = {
@@ -217,7 +217,7 @@ A post is a wordpress post displayed on the website. The following parameters of
 
 **Endpoints:**
 
-- Post Detail: [https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/posts/{post_id}](https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/posts/2648)
+- Post Detail: [https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/posts/{post_id}](https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/posts/2648)
 
 **Sample request:**
 
@@ -225,7 +225,7 @@ A post is a wordpress post displayed on the website. The following parameters of
 import requests
 
 post_id = 2648
-url = f"https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/posts/{post_id}"
+url = f"https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/posts/{post_id}"
 
 payload={}
 headers = {
@@ -321,7 +321,7 @@ This endpoint will be used to get the author details for a post.
 
 **Endpoints:**
 
-- Author Details: [https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/users/{author_id}](https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/users/1)
+- Author Details: [https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/users/{author_id}](https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/users/1)
 
 **Sample request:**
 
@@ -329,7 +329,7 @@ This endpoint will be used to get the author details for a post.
 import requests
 
 author_id = 1
-url = f"https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/users/{author_id}"
+url = f"https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/users/{author_id}"
 
 payload={}
 headers = {
@@ -377,7 +377,7 @@ This endpoint will be used to fetch information related to different tags attach
 
 **Endpoints:**
 
-- Tag Detail: [https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/tags/{tag_id}](https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/tags/67)
+- Tag Detail: [https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/tags/{tag_id}](https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/tags/67)
 
 **Sample request:**
 
@@ -385,7 +385,7 @@ This endpoint will be used to fetch information related to different tags attach
 import requests
 
 tag_id = 67
-url = f"https://wpbackend.vip3rtech6069.com//wp-json/wp/v2/tags/{tag_id}"
+url = f"https://wpbackend.vip3rtech6069.com/wp-json/wp/v2/tags/{tag_id}"
 
 payload={}
 headers = {

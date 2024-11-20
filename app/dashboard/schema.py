@@ -4,7 +4,8 @@ import dashboard.inputs as dashboard_inputs
 import typing
 import strawberry
 from dashboard.services.weaviate_service import WeaviateService
-import json
+from dashboard.services.wordpress_service import WordpressApiService
+from datetime import datetime
 
 
 @strawberry.type
@@ -21,6 +22,14 @@ class Query:
             else:
                 result = [await service.view_collection(name=name)]
         return result
+    
+    @strawberry.field
+    async def posts(self, info:strawberry.Info, modified_date:str)->typing.List[dashboard_types.Post]:
+        """
+        Retrieves all posts from wordpress rest api that were modified after a given date
+        """
+        async with WordpressApiService() as service:
+            return await service.get_posts(modified_date=datetime.fromisoformat(modified_date))
 
     
 @strawberry.type
