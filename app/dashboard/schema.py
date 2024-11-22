@@ -5,8 +5,10 @@ import typing
 import strawberry
 from dashboard.services.weaviate_service import WeaviateService
 from dashboard.services.wordpress_service import WordpressApiService
+from dashboard.models import PostSynchronizationProgress
 from datetime import datetime
-
+from dashboard.tasks import synchronize_posts
+from asgiref.sync import sync_to_async
 
 @strawberry.type
 class Query:
@@ -30,6 +32,27 @@ class Query:
         """
         async with WordpressApiService() as service:
             return await service.get_posts(modified_date=datetime.fromisoformat(modified_date))
+        
+
+    @strawberry.field
+    async def post_synchronization_status(self, info:strawberry.Info, task_id:int)->dashboard_types.PostSynchronizationProgressType|None:
+        """
+        Retrieves the status of a post synchronization task.
+        @param task_id: The id of the task.
+        """
+        try:
+            task = await PostSynchronizationProgress.objects.aget(id=task_id)
+            return dashboard_types.PostSynchronizationProgressType.from_dict({
+                "id": task.id,
+                "created_at": task.created_at,
+                "updated_at": task.updated_at,
+                "progress": task.progress,
+                "status": task.status,
+                "message": task.message
+            })
+
+        except PostSynchronizationProgress.DoesNotExist:
+            return None
 
     
 @strawberry.type
@@ -70,23 +93,35 @@ class DatasetMutation:
 class PostMutation:
 
     @strawberry.mutation
-    async def synchronize(self, info:strawberry.Info, modified_date:str)->typing.List[dashboard_types.Post]:
+    async def synchronize(self, info:strawberry.Info, modified_date:str)->dashboard_types.PostSynchronizationProgressType|None:
         """
         Synchronize posts from wordpress rest api to Weaviate.
         """
+        task = await PostSynchronizationProgress.objects.acreate()
         try:
             modified_date = datetime.fromisoformat(modified_date)
         except ValueError:
-            return []
+            await task.aupdate_progress(PostSynchronizationProgress.STATUS_FAILED, f'Invalid date format. Expected format: YYYY-MM-DDTHH:MM:SS', current_step=-1)
+            return dashboard_types.PostSynchronizationProgressType.from_dict({
+                "id": task.id,
+                "created_at": task.created_at,
+                "updated_at": task.updated_at,
+                "progress": task.progress,
+                "status": task.status,
+                "message": task.message
+            })
         
-        async with WordpressApiService() as service:
-            posts = await service.get_posts(modified_date=modified_date)
-            if len(posts) == 0:
-                return []
-            
-            async with WeaviateService() as weaviate_service:
-                return await weaviate_service.synchronize_posts(posts)
-        return []
+        await task.aupdate_progress(PostSynchronizationProgress.STATUS_PENDING, f'Starting synchronization of posts modified after {modified_date}', current_step=0)
+        synchronize_posts.apply_async((modified_date, task.id), countdown=5)
+        return dashboard_types.PostSynchronizationProgressType.from_dict({
+            "id": task.id,
+            "created_at": task.created_at,
+            "updated_at": task.updated_at,
+            "progress": task.progress,
+            "status": task.status,
+            "message": task.message
+        })
+        
 
 @strawberry.type
 class Mutation:

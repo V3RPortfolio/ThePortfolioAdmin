@@ -5,6 +5,43 @@ from datetime import datetime
 from weaviate.classes.config import DataType
 from abc import ABC, abstractmethod
 
+
+@strawberry.type
+class PostSynchronizationProgressType:
+    id:int
+    created_at:datetime
+    updated_at:datetime
+    progress:int
+    status:str
+    message:str
+
+    @staticmethod
+    def to_dict(progress:PostSynchronizationProgressType)->dict:
+        return {
+            "id": progress.id,
+            "created_at": progress.created_at,
+            "updated_at": progress.updated_at,
+            "progress": progress.progress,
+            "status": progress.status,
+            "message": progress.message
+        }
+    
+    @staticmethod
+    def from_dict(data:dict)->typing.Type[PostSynchronizationProgressType]:
+        if not data or type(data) is not dict:
+            return None
+
+        return PostSynchronizationProgressType(
+            id=data.get("id", -1),
+            created_at=data.get("created_at", datetime.now()),
+            updated_at=data.get("updated_at", datetime.now()),
+            progress=data.get("progress", 0),
+            status=data.get("status", ""),
+            message=data.get("message", "")
+        )
+    
+    
+
 @strawberry.type
 class DatasetProperty:
 

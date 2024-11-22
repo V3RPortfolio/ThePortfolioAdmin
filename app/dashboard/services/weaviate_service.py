@@ -6,6 +6,7 @@ from weaviate.classes.init import AdditionalConfig, Timeout, Auth
 from weaviate.classes.config import Property, DataType, Configure, VectorDistances
 from weaviate.classes.query import Filter
 import re
+from dashboard.models import PostSynchronizationProgress
 
 
 from typing import List, Optional, Type
@@ -180,7 +181,7 @@ class WeaviateService:
             
             if bool(re.match(r'\s', current_char)): # Increase word count if a whitespace occurs
                 current_word_count += 1
-            elif current_char == '.': # Store where the last sentence ended
+            elif current_char == '.': # Store where the last sentence
                 last_sentence_ended_at = current_char_index
 
             # If the max word limit has been reached
@@ -189,8 +190,10 @@ class WeaviateService:
                 break
                 
             elif current_word_count >= self.max_words_per_post: # The maximum word count has been reached
+                if last_chunk_ended_at == last_sentence_ended_at: # Probably the chunk contains code -- Parse code separately later
+                    last_sentence_ended_at = current_char_index
                 result.append(content[last_chunk_ended_at:last_sentence_ended_at] + ".") # Update the chunk      
-                
+                    
                 current_word_count = 0 # Reset the word count
                 last_chunk_ended_at = last_sentence_ended_at # The next chunk will start from where the current chunk was made
                 current_char_index = last_sentence_ended_at + 1 # Go back to where the last chunk ended
@@ -199,7 +202,7 @@ class WeaviateService:
         return result
     
 
-    async def synchronize_posts(self, posts:List[dashboard_types.Post])->List[dashboard_types.Post]:
+    async def synchronize_posts(self, posts:List[dashboard_types.Post], task:PostSynchronizationProgress=None, current_step:int=0)->List[dict]:
         """
         Updates or adds the posts in weaviate
         1. Extract all the post ids
@@ -207,9 +210,12 @@ class WeaviateService:
         3. Split each post into multiple chunks with sequence number and add them to weaviate.
         4. Fetch all posts from weaviate that are marked as deleted and delete them
         @param posts: List of posts to be synchronized
+        @param task: The task object to update the progress
+        @param current_step: The current step of the task
         """
         if not posts or len(posts) == 0:
-            return []
+            await task.aupdate_progress(PostSynchronizationProgress.STATUS_COMPLETED, f'No posts found to synchronize', current_step=-1)
+            return
         
         try:
             collection = self.client.collections.get(self.weaviate_post_collection)
@@ -219,6 +225,8 @@ class WeaviateService:
             # Update all posts in the weaviate collection that matches the post ID and mark it as deleted
             unique_post_ids = set([post.postId for post in posts])    
             stale_post_ids = []
+            await task.aupdate_progress(PostSynchronizationProgress.STATUS_IN_PROGRESS, f'Fetching stale posts from the database', current_step=current_step)
+            current_step += 1
             for post_id in unique_post_ids:
                 existing_posts = await collection.query.fetch_objects(
                     filters=Filter.by_property("postId").equal(str(post_id)),
@@ -227,7 +235,9 @@ class WeaviateService:
 
             stale_post_ids = list(set(stale_post_ids))
             # Split each post into multiple chunks with sequence number and add them to weaviate.
-            for post in posts:
+            for i in range(len(posts)):
+                post = posts[i]
+                await task.aupdate_progress(PostSynchronizationProgress.STATUS_IN_PROGRESS, f'Splitting post content into multiple chunks and updating the database. {i} out of {len(posts)} completed.', current_step=current_step)
                 chunks = self._create_chunks_for_post(post.postContent)
                 post_properties = dashboard_types.Post.to_dict(post)
                 del post_properties["id"]
@@ -236,27 +246,35 @@ class WeaviateService:
                     post_properties["postSequence"] = index + 1
                     post_properties["isDeleted"] = False
                     
-
-                    await collection.data.insert(
-                        properties=post_properties,
-                        vector=dashboard_types.Post.from_dict(post_properties).get_embedding()
-                    )
-
+                    try:
+                        await collection.data.insert(
+                            properties=post_properties,
+                            vector=dashboard_types.Post.from_dict(post_properties).get_embedding()
+                        )
+                    except Exception as e:
+                        print(f"Error inserting chunk {index} of post {post.postId}")
+                        print(e)
+                        
+            current_step += 1
+            await task.aupdate_progress(PostSynchronizationProgress.STATUS_IN_PROGRESS, f'Deleting stale posts', current_step=current_step)
+            current_step += 1
             # Fetch all posts from weaviate that are marked as deleted and delete them
             await collection.data.delete_many(
                 where=Filter.any_of([Filter.by_id().equal(i) for i in stale_post_ids])
             )
 
             result = []
+            await task.aupdate_progress(PostSynchronizationProgress.STATUS_IN_PROGRESS, f'Fetching new posts', current_step=current_step)
             for post_id in unique_post_ids:
                 existing_posts = await collection.query.fetch_objects(
                     filters=Filter.by_property("postId").equal(str(post_id)),
+                    return_properties=["postId"]
                 )
-                for existing_post in existing_posts.objects:
-                    result.append(dashboard_types.Post.from_dict(existing_post.properties))
+                result.append(existing_posts)
             return result
 
             
         except Exception as e:
             print(f"Error updating posts: {e}")
+            await task.aupdate_progress(PostSynchronizationProgress.STATUS_FAILED, str(e), current_step=current_step)
             return []
