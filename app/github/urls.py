@@ -17,9 +17,10 @@ Including another URLconf
 
 from django.urls import path
 from strawberry.django.views import AsyncGraphQLView
+from django.views.decorators.csrf import csrf_exempt
 from .schema import schema
 
 
 urlpatterns = [
-    path("graphql/v1", AsyncGraphQLView.as_view(schema=schema), name="graphql"),
+    path("graphql/v1", csrf_exempt(AsyncGraphQLView.as_view(schema=schema)), name="graphql"),
 ]
