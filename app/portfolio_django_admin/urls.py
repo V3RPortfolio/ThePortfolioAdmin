@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from portfolio_django_admin.views import index, csrf
+from django.conf import settings
 
 urlpatterns = [
     path('', index, name='home'),
@@ -25,3 +26,8 @@ urlpatterns = [
     path('github/', include('github.urls')),
     path('auth/', include('authentication.urls')),
 ]
+
+if settings.DEBUG:
+    # Add route for static files
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

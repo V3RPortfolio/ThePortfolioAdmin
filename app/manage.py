@@ -9,7 +9,7 @@ def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio_django_admin.settings')
     if settings.DEBUG:
-        if os.environ.get('RUN_MAIN') or os.environ.get('WERKZEUG_RUN_MAIN'):
+        if os.getenv('DEBUG_APP', '0') == 1 and  os.environ.get('RUN_MAIN') or os.environ.get('WERKZEUG_RUN_MAIN'):
             import debugpy
             debugpy.listen(("0.0.0.0", 4000))
             debugpy.wait_for_client()

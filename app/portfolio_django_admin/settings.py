@@ -84,7 +84,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # Custom Middleware
-    'authentication.middleware.AsyncAuthMiddleware',
+    # 'authentication.middleware.AsyncAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'portfolio_django_admin.urls'
@@ -182,8 +182,6 @@ COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.rCSSMinFilter'
 ]
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
