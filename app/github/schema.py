@@ -15,7 +15,6 @@ import json
 class Query:
     
     @strawberry.field
-    @require_graphql_roles([RoleType.ADMIN])    
     async def issue_counts(self, info:strawberry.Info)->typing.List[github_types.GithubIssueCount]:
         """
         Retrieves the issues from the Github REST API.
