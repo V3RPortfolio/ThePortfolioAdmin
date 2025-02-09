@@ -8,6 +8,8 @@ from django.contrib.auth.models import AbstractUser
 from authentication.models import UserRole, RoleType
 from asgiref.sync import sync_to_async
 
+
+
 class AuthBearer(HttpBearer):
     async def authenticate(self, request, token):
         try:
@@ -19,6 +21,7 @@ class AuthBearer(HttpBearer):
             return payload
         except JWTError:
             return None
+        
         
 @sync_to_async
 def get_roles(user:AbstractUser)->list[RoleType]:
@@ -53,3 +56,10 @@ async def create_access_token(data: dict, expires_delta: Optional[timedelta] = N
         algorithm=settings.JWT_ALGORITHM
     )
     return encoded_jwt
+
+def decode_token(token:str)->dict:
+    return jwt.decode(
+        token, 
+        settings.JWT_SECRET_KEY, 
+        algorithms=[settings.JWT_ALGORITHM]
+    )

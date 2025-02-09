@@ -12,7 +12,7 @@ def require_roles(allowed_roles: Union[RoleType, List[RoleType]]):
         @wraps(func)
         async def wrapper(request, *args, **kwargs):
             # Get roles from JWT token
-            user_roles = request.auth.get("roles", []) if request.auth else []
+            user_roles = request.roles or []
             
             # Check if user has any of the required roles
             if not any(role in [r.value for r in allowed_roles] for role in user_roles):
@@ -33,7 +33,12 @@ def require_graphql_roles(allowed_roles: Union[RoleType, List[RoleType]]):
         @wraps(func)
         async def wrapper(root, info, *args, **kwargs):
             # Get roles from context (passed from middleware)
-            user_roles = info.context.get("roles", []) if info.context else []
+            try:
+                if not info.context or not info.context.request:
+                    raise Exception("No context found")
+                user_roles = info.context.request.roles or []
+            except:
+                user_roles = []
             
             # Check if user has any of the required roles
             if not any(role in [r.value for r in allowed_roles] for role in user_roles):

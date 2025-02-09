@@ -84,7 +84,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # Custom Middleware
-    # 'authentication.middleware.AsyncAuthMiddleware',
+    'authentication.middleware.AuthorizationMiddleware',
 ]
 
 ROOT_URLCONF = 'portfolio_django_admin.urls'
