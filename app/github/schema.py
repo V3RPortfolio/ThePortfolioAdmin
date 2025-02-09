@@ -2,6 +2,8 @@ import github.services.github_service as github_service
 from github.services.caching_service import GQLCachingService
 import github.types as github_types
 from github.models import GithubRepository
+from authentication.models import RoleType
+from authentication.decorators import require_graphql_roles
 
 import typing
 import strawberry
@@ -13,6 +15,7 @@ import json
 class Query:
     
     @strawberry.field
+    @require_graphql_roles([RoleType.ADMIN])    
     async def issue_counts(self, info:strawberry.Info)->typing.List[github_types.GithubIssueCount]:
         """
         Retrieves the issues from the Github REST API.

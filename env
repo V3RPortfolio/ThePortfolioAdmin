@@ -12,6 +12,7 @@ DJANGO_ADMIN_DEBUG=True
 DJANGO_ADMIN_SERVICE_SECRET_KEY='some kind of valid secret key'
 DJANGO_ADMIN_SERVICE_ALLOWED_HOSTS="localhost,[::1],[::1]:8000,localhost:4200,[::1]:4200"
 DJANGO_ADMIN_CSRF_TRUSTED_ORIGIN="http://localhost:4200,http://localhost:8000,http://[::1]:8000"
+DJANGO_JWT_SECRET_KEY="xj7LpS_qYzxhq-kh9FFgWpHXhZQYRKe0paWfp7_Wo5g"
 
 # Github
 GITHUB_PAT="12323"

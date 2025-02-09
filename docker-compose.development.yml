@@ -4,7 +4,7 @@ services:
   django_admin:
     build: .
     container_name: myportfolio-djangoadmin
-    command: python manage.py runserver 0.0.0.0:${DJANGO_ADMIN_LOCAL_PORT}
+    command: uvicorn portfolio_django_admin.asgi:application --host 0.0.0.0 --port ${DJANGO_ADMIN_LOCAL_PORT} --reload
     volumes:
       - ./app:/app
     ports:
@@ -32,6 +32,8 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_USER=${REDIS_USER}
+
+      - JWT_SECRET_KEY=${DJANGO_JWT_SECRET_KEY}
 
       # - IAM_CLIENT_ID=${PORTFOLIO_IAM_CLIENT_ID}
       # - IAM_CLIENT_SECRET=${PORTFOLIO_IAM_CLIENT_SECRET}
