@@ -71,3 +71,6 @@ development/
 
 # Microsoft 365
 **/o365_token.txt
+
+# Django
+app/staticfiles
