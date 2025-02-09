@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'portfolio_django_admin',
     'github',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Custom Middleware
+    'authentication.middleware.AsyncAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'portfolio_django_admin.urls'
@@ -113,7 +117,7 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'mydb'),
+        'NAME': os.getenv('POSTGRES_DB', 'djangoadmin'),
         'USER': os.getenv('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
         'HOST': os.getenv("POSTGRES_HOST", "localhost"),
@@ -210,3 +214,8 @@ CACHES = {
 # Optional: This is to ensure Django sessions are stored in Redis
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
+
+# JWT Settings
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
+JWT_ALGORITHM = 'HS256'
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30

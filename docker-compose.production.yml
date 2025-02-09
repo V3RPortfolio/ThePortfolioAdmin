@@ -35,6 +35,8 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_USER=${REDIS_USER}
 
+      - JWT_SECRET_KEY=${DJANGO_JWT_SECRET_KEY}
+
 networks:
   platform_net:
     driver: bridge
