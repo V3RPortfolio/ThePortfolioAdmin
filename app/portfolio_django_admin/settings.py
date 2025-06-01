@@ -31,18 +31,15 @@ if os.path.exists(env_path):
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-origins = os.getenv('TRUSTED_ORIGINS', '').split(',')
-
-if origins and len(origins) > 0 and origins[0] != '':
-    CSRF_TRUSTED_ORIGINS = origins
-
-    CORS_ALLOWED_ORIGINS = origins
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+CORS_ALLOW_ALL_ORIGINS = DEBUG == True
+CSRF_TRUSTED_ORIGINS = os.getenv('TRUSTED_ORIGINS', '*').split(',')
+CORS_ALLOWED_ORIGINS = os.getenv('TRUSTED_ORIGINS', '*').split(',')
 
 CORS_ALLOW_CREDENTIALS = True
-CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
 CSRF_COOKIE_SECURE = not DEBUG
 
 # CSRF_COOKIE_HTTPONLY=True
@@ -57,6 +54,8 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'cookie',
+    
 ]
 
 # Application definition
@@ -80,8 +79,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -160,7 +159,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 # Static files (CSS, JavaScript, Images)
@@ -199,7 +197,6 @@ REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 REDIS_USERNAME = os.getenv('REDIS_USERNAME', 'redis')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'redis')
 REDIS_PATH = f"redis://{REDIS_HOST}:{REDIS_PORT}"
-
 
 # Redis
 CACHES = {

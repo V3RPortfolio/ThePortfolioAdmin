@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from portfolio_django_admin.views import index, csrf
 
-from authentication.views import api as auth_api
+from authentication.views import router as auth_api
+from ninja import Router
 
-urlpatterns = [
-    path('', auth_api.urls),
-]
+router = Router()
+router.add_router("", auth_api)

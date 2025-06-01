@@ -1,5 +1,6 @@
-from ninja import NinjaAPI
+from ninja import Router
 from django.contrib.auth import authenticate
+from django.shortcuts import redirect
 from authentication.schemas import TokenPayload, AuthResponse, ErrorMessage
 from authentication.services.auth import create_access_token, AuthBearer
 from datetime import timedelta
@@ -8,11 +9,11 @@ from asgiref.sync import sync_to_async
 from authentication.decorators import require_roles
 from authentication.models import RoleType
 
-api = NinjaAPI(auth=AuthBearer())
+router = Router()
 
 
 authenticate_user= sync_to_async(authenticate)
-@api.post("/token", response={200: AuthResponse, 401: ErrorMessage}, auth=None)
+@router.post("/token", response={200: AuthResponse, 401: ErrorMessage}, auth=None)
 async def login(request, payload: TokenPayload):
     user = await authenticate_user(username=payload.username, password=payload.password)
     if not user:
@@ -25,12 +26,12 @@ async def login(request, payload: TokenPayload):
     
     return 200, {"access_token": access_token}
 
-@api.get("/me", response={200: dict, 401: ErrorMessage})
+@router.get("/me", response={200: dict, 401: ErrorMessage})
 async def me(request):
     return {"username": request.auth["sub"]}
 
 # Example protected endpoint
-@api.get("/protected", response={200: dict, 401: ErrorMessage})
+@router.get("/protected", response={200: dict, 401: ErrorMessage})
 @require_roles([RoleType.ADMIN])
 async def protected_route(request):
     return {"message": f"Hello {request.auth['sub']}! This is a protected endpoint"}
