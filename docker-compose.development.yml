@@ -46,5 +46,5 @@ services:
 networks:
   platform_net:
     driver: bridge
-    name: vulnerability-network
+    name: my-portfolio-network
     external: true
