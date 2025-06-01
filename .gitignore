@@ -74,3 +74,5 @@ development/
 
 # Django
 app/staticfiles
+docker-compose*.development.yml
+docker-compose*.debug.yml
