@@ -11,6 +11,9 @@ services:
       - "${DJANGO_ADMIN_HOST_PORT}:${DJANGO_ADMIN_LOCAL_PORT}"
       - 3000:4000
 
+    env_file:
+      - ./app/.env
+
     networks:
       - platform_net
 
