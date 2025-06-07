@@ -21,9 +21,16 @@ from authentication.urls import router as auth_api
 from authentication.services.auth import AuthBearer
 from vulnerability_analysis.urls import router as vulnerability_api
 from django.conf import settings
-from ninja import NinjaAPI  
+from ninja import NinjaAPI, Redoc, Swagger  
 
-api = NinjaAPI(auth=AuthBearer())
+api = NinjaAPI(
+    auth=AuthBearer(), 
+    title="Portfolio API", 
+    description="Portfolio API", 
+    version="1.0.0", 
+    docs=Swagger() if settings.DEBUG else Redoc(),
+    urls_namespace="api"
+)
 
 api.add_router("/auth/v1/", auth_api)
 api.add_router("/device/v1/", vulnerability_api)
