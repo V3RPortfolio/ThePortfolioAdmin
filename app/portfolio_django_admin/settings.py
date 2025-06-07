@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     "daphne",
+    'ninja',
     
     'django.contrib.staticfiles',
     'corsheaders',
