@@ -44,6 +44,7 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 # CSRF_COOKIE_HTTPONLY=True
 # Add allowed headers
+DEVICE_TOKEN_HEADER = "X-Device-Token"
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -55,7 +56,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
     'cookie',
-    
+    DEVICE_TOKEN_HEADER.lower(),
 ]
 
 # Application definition
@@ -149,6 +150,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -218,11 +220,10 @@ SESSION_CACHE_ALIAS = 'default'
 # JWT Settings
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
 JWT_REFRESH_SECRET_KEY = os.getenv('JWT_REFRESH_SECRET_KEY', SECRET_KEY)
-DEVICE_TOKEN_KEY=os.getenv("DEVICE_TOKEN_KEY", SECRET_KEY)
+DEVICE_TOKEN_KEY = os.getenv('DEVICE_TOKEN_KEY', SECRET_KEY)
 JWT_ALGORITHM = 'HS256'
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
 JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7  # Refresh token valid for 7 days
 
 # Device Token Settings
 DEVICE_TOKEN_EXPIRATION = int(os.getenv('DEVICE_TOKEN_EXPIRATION', 3600))
-DEVICE_TOKEN_HEADER = os.getenv('DEVICE_TOKEN_HEADER', 'X-Device-Token')

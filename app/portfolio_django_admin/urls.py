@@ -18,18 +18,32 @@ from django.contrib import admin
 from django.urls import path, include
 from portfolio_django_admin.views import index, csrf
 from authentication.urls import router as auth_api
-from authentication.services.auth import AuthBearer
+from authentication.services.auth import AuthBearer, DeviceBearer
 from vulnerability_analysis.urls import router as vulnerability_api
 from django.conf import settings
 from ninja import NinjaAPI, Redoc, Swagger  
 
 api = NinjaAPI(
-    auth=AuthBearer(), 
+    auth=[AuthBearer()], 
     title="Portfolio API", 
     description="Portfolio API", 
     version="1.0.0", 
     docs=Swagger() if settings.DEBUG else Redoc(),
-    urls_namespace="api"
+    urls_namespace="api",
+    openapi_extra={
+        "components": {
+            "parameters": {
+                "DeviceTokenHeader": {  # This is a descriptive name for your security scheme
+                    "name": "X-Device-Token",  # The name of your custom header
+                    "in": "header",
+                    "required": True,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
 )
 
 api.add_router("/auth/v1/", auth_api)

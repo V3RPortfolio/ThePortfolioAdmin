@@ -15,3 +15,9 @@ class RefreshTokenPayload(Schema):
 
 class ErrorMessage(Schema):
     message: str
+
+class DeviceTokenPayload(Schema):
+    device_id: str
+    device_name: str
+    device_mac: str
+

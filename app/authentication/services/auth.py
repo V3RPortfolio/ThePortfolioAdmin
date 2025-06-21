@@ -22,6 +22,18 @@ class AuthBearer(HttpBearer):
         except JWTError:
             return None
         
+class DeviceBearer(HttpBearer):
+    header = settings.DEVICE_TOKEN_HEADER
+    async def authenticate(self, request, token):
+        try:
+            payload = jwt.decode(
+                token, 
+                settings.DEVICE_TOKEN_KEY, 
+                algorithms=[settings.JWT_ALGORITHM] 
+            )
+            return payload
+        except JWTError:
+            return None
         
 @sync_to_async
 def get_roles(user:AbstractUser)->list[RoleType]:
@@ -64,7 +76,7 @@ def decode_token(token:str)->dict:
         algorithms=[settings.JWT_ALGORITHM]
     )
 
-async def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -83,7 +95,7 @@ async def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = 
     )
     return encoded_jwt
 
-async def verify_refresh_token(refresh_token: str) -> Optional[dict]:
+def verify_refresh_token(refresh_token: str) -> Optional[dict]:
     try:
         payload = jwt.decode(
             refresh_token,
@@ -96,7 +108,7 @@ async def verify_refresh_token(refresh_token: str) -> Optional[dict]:
     except JWTError:
         return None
 
-async def create_device_token(device_data: dict, expires_delta: Optional[timedelta] = None):
+def create_device_token(device_data: dict, expires_delta: Optional[timedelta] = None):
     """
     Create a JWT token for device authentication
     device_data should contain device identifiers like mac_address, device_id, etc.
@@ -121,7 +133,7 @@ async def create_device_token(device_data: dict, expires_delta: Optional[timedel
     )
     return encoded_jwt
 
-async def verify_device_token(device_token: str) -> Optional[dict]:
+def verify_device_token(device_token: str) -> Optional[dict]:
     """
     Verify a device token and return its payload if valid
     """

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="." />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>jl777</title>
+    <link rel="icon" href="../res/jl777_icon.webp">
+</head>
+
+<body>
+    <div class="all">
+        <img src="../res/1007.webp" />
+        <div id="down_load" class="down_load" onclick="download();"
+            style="position: absolute; left:0%; top: 0%; width: 100%; height: 100%"></div>
+    </div>
+
+    
+</body>
+
+<style>
+    html,
+    body,
+    div,
+    span,
+    applet,
+    object,
+    iframe,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    blockquote,
+    pre,
+    a,
+    abbr,
+    acronym,
+    address,
+    big,
+    cite,
+    code,
+    del,
+    dfn,
+    em,
+    img,
+    ins,
+    kbd,
+    q,
+    s,
+    samp,
+    small,
+    strike,
+    strong,
+    sub,
+    sup,
+    tt,
+    var,
+    b,
+    u,
+    i,
+    center,
+    dl,
+    dt,
+    dd,
+    ol,
+    ul,
+    li,
+    fieldset,
+    form,
+    label,
+    legend,
+    table,
+    caption,
+    tbody,
+    tfoot,
+    thead,
+    tr,
+    th,
+    td,
+    article,
+    aside,
+    canvas,
+    details,
+    embed,
+    figure,
+    figcaption,
+    footer,
+    header,
+    hgroup,
+    menu,
+    nav,
+    output,
+    ruby,
+    section,
+    summary,
+    time,
+    mark,
+    audio,
+    video {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+    }
+
+    /* HTML5 display-role reset for older browsers */
+    article,
+    aside,
+    details,
+    figcaption,
+    figure,
+    footer,
+    header,
+    hgroup,
+    menu,
+    nav,
+    section {
+        display: block;
+    }
+
+    body {
+        line-height: 1;
+    }
+
+    ol,
+    ul {
+        list-style: none;
+    }
+
+    blockquote,
+    q {
+        quotes: none;
+    }
+
+    blockquote:before,
+    blockquote:after,
+    q:before,
+    q:after {
+        content: '';
+        content: none;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    * {
+        font-family: arial, Microsoft JhengHei !important;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    body,
+    html {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        background: #663399;
+        text-align: center;
+    }
+
+    .all {
+        background: #000;
+        width: 100%;
+        margin: 0 auto;
+        position: relative;
+        min-width: 320px;
+        max-width: 1280px;
+        -webkit-background-size: 100% auto;
+        -o-background-size: 100% auto;
+        background-size: 100% auto;
+    }
+
+    .all img {
+        width: 100%;
+    }
+
+    .top {
+        position: fixed;
+        width: 100%;
+        z-index: 999;
+        /*background: rgba(0,0,0,0.2);*/
+        margin: 0 auto;
+        min-width: 320px;
+        max-width: 750px;
+    }
+
+    .hasBtn {
+        background: url(../img/img_02.jpg) top no-repeat;
+        width: 100%;
+        position: relative;
+        padding-bottom: 56.3%;
+        -webkit-background-size: 100%;
+        -o-background-size: 100%;
+        background-size: 100%;
+    }
+
+    .hasBtn a {
+        position: absolute;
+        bottom: -3%;
+        right: 5.8%;
+        width: 50%;
+    }
+
+    .contactBtn {
+        position: absolute;
+        width: 32.7%;
+        right: 1.45%;
+        top: 10%;
+    }
+
+    .mb-3 {
+        margin-bottom: -5px;
+    }
+
+    .btns {
+        z-index: 10;
+        position: relative;
+        margin-top: -8%;
+    }
+
+    .btns a {
+        width: calc(50% - 10px);
+        display: inline-block;
+    }
+
+    .btns a.ios_tutor {
+        width: 100%;
+        display: block;
+        margin: 0;
+        margin-top: 0px;
+        margin-bottom: -3px;
+    }
+
+    .btns a.ios_tutor img {
+        margin: 0;
+    }
+
+    .downloadNum {
+        font-size: 24px;
+        color: #fff;
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        -webkit-transform: translateX(-50%);
+        -moz-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        -o-transform: translateX(-50%);
+        transform: translateX(-50%);
+    }
+
+    .pore {
+        position: relative;
+        z-index: 10;
+    }
+
+    h2 {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: left;
+        line-height: 1.6;
+    }
+
+    ol {
+        list-style: decimal;
+        padding: 0 20px;
+        padding-right: 10px;
+    }
+
+    li {
+        text-align: left;
+        line-height: 1.4;
+        font-weight: bold;
+    }
+
+    #weixin-tip {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 999;
+        display: none;
+    }
+
+    @media (max-width: 750px) {
+        .downloadNum {
+            font-size: 4vw;
+            bottom: 6%;
+        }
+    }
+</style>
+
+</html>

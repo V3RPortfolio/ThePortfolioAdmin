@@ -6,7 +6,7 @@ from authentication.services.auth import create_access_token, AuthBearer, create
 from datetime import timedelta
 from django.conf import settings
 from asgiref.sync import sync_to_async
-from authentication.decorators import require_roles, require_device_token, require_device_and_roles
+from authentication.decorators import require_roles, require_device_token
 from authentication.models import RoleType
 
 router = Router()
@@ -24,7 +24,7 @@ async def login(request, payload: TokenPayload):
         expires_delta=timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     
-    refresh_token = await create_refresh_token(
+    refresh_token = create_refresh_token(
         data={"sub": user.username},
         expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     )
@@ -36,7 +36,7 @@ async def login(request, payload: TokenPayload):
 
 @router.post("/refresh", response={200: AuthResponse, 401: ErrorMessage}, auth=None)
 async def refresh_token(request, payload: RefreshTokenPayload):
-    refresh_payload = await verify_refresh_token(payload.refresh_token)
+    refresh_payload = verify_refresh_token(payload.refresh_token)
     if not refresh_payload:
         return 401, {"message": "Invalid refresh token"}
     
@@ -45,7 +45,7 @@ async def refresh_token(request, payload: RefreshTokenPayload):
         expires_delta=timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     
-    refresh_token = await create_refresh_token(
+    refresh_token = create_refresh_token(
         data={"sub": refresh_payload["sub"]},
         expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     )
@@ -75,7 +75,8 @@ async def protected_device_route(request):
 
 # Example using combined device and role authentication
 @router.get("/protected-device-admin", response={200: dict, 401: ErrorMessage})
-@require_device_and_roles([RoleType.ADMIN])
+@require_roles([RoleType.ADMIN])
+@require_device_token()
 async def protected_device_admin_route(request):
     return {
         "message": "Device and admin role authenticated successfully",
