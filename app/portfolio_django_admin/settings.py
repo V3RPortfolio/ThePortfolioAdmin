@@ -55,7 +55,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
     'cookie',
-    
+    constants.DEVICE_TOKEN_HEADER.lower(),
 ]
 
 # Application definition
@@ -149,6 +149,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -217,5 +218,32 @@ SESSION_CACHE_ALIAS = 'default'
 
 # JWT Settings
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
+JWT_REFRESH_SECRET_KEY = os.getenv('JWT_REFRESH_SECRET_KEY', SECRET_KEY)
+DEVICE_TOKEN_KEY = os.getenv('DEVICE_TOKEN_KEY', SECRET_KEY)
 JWT_ALGORITHM = 'HS256'
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 300
+JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7  # Refresh token valid for 7 days
+
+# Device Token Settings
+DEVICE_TOKEN_EXPIRATION = int(os.getenv('DEVICE_TOKEN_EXPIRATION', 3600))
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}
