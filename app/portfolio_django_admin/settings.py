@@ -44,7 +44,6 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 # CSRF_COOKIE_HTTPONLY=True
 # Add allowed headers
-DEVICE_TOKEN_HEADER = "X-Device-Token"
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -56,7 +55,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
     'cookie',
-    DEVICE_TOKEN_HEADER.lower(),
+    constants.DEVICE_TOKEN_HEADER.lower(),
 ]
 
 # Application definition
@@ -227,3 +226,24 @@ JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7  # Refresh token valid for 7 days
 
 # Device Token Settings
 DEVICE_TOKEN_EXPIRATION = int(os.getenv('DEVICE_TOKEN_EXPIRATION', 3600))
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}

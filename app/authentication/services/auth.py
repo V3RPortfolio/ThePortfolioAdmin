@@ -23,7 +23,6 @@ class AuthBearer(HttpBearer):
             return None
         
 class DeviceBearer(HttpBearer):
-    header = settings.DEVICE_TOKEN_HEADER
     async def authenticate(self, request, token):
         try:
             payload = jwt.decode(

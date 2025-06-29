@@ -7,8 +7,7 @@ from authentication.schemas import DeviceTokenPayload
 from django.http import JsonResponse
 from authentication.services.auth import verify_device_token
 from datetime import datetime
-from django.conf import settings
-from asgiref.sync import sync_to_async
+from portfolio_django_admin.constants import DEVICE_TOKEN_HEADER
 
 
 
@@ -97,7 +96,7 @@ def require_device_token():
         if is_function_async(func):
             @wraps(func)
             async def wrapper(request, *args, **kwargs):
-                device_token = request.headers.get(settings.DEVICE_TOKEN_HEADER)
+                device_token = request.headers.get(DEVICE_TOKEN_HEADER)
                 
                 if not device_token:
                     return JsonResponse(
@@ -123,13 +122,13 @@ def require_device_token():
                     )
                 
                 # Add verified device info to request for use in the endpoint
-                request.device_info = DeviceTokenPayload(**device_payload).model_dump()
+                request.device_info = DeviceTokenPayload(**device_payload)
                 
                 return await func(request, *args, **kwargs)
         else:
             @wraps(func)
             def wrapper(request, *args, **kwargs):
-                device_token = request.headers.get(settings.DEVICE_TOKEN_HEADER)
+                device_token = request.headers.get(DEVICE_TOKEN_HEADER)
                 
                 if not device_token:
                     return JsonResponse(
@@ -146,7 +145,7 @@ def require_device_token():
                     )
                 
                 # Add verified device info to request for use in the endpoint
-                request.device_info = DeviceTokenPayload(**device_payload).model_dump()
+                request.device_info = DeviceTokenPayload(**device_payload)
 
                 expiration = datetime.fromtimestamp(device_payload.get("exp", 0))
                 if datetime.utcnow() > expiration:
@@ -155,7 +154,7 @@ def require_device_token():
                         status=401
                     )
                 
-                request.device_info = DeviceTokenPayload(**device_payload).model_dump()
+                request.device_info = DeviceTokenPayload(**device_payload)
                 
                 return func(request, *args, **kwargs)
                 

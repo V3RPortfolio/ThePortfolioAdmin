@@ -22,6 +22,7 @@ from authentication.services.auth import AuthBearer, DeviceBearer
 from vulnerability_analysis.urls import router as vulnerability_api
 from django.conf import settings
 from ninja import NinjaAPI, Redoc, Swagger  
+from .constants import OPENAPI_DEVICE_EXTRA
 
 api = NinjaAPI(
     auth=[AuthBearer()], 
@@ -33,18 +34,12 @@ api = NinjaAPI(
     openapi_extra={
         "components": {
             "parameters": {
-                "DeviceTokenHeader": {  # This is a descriptive name for your security scheme
-                    "name": "X-Device-Token",  # The name of your custom header
-                    "in": "header",
-                    "required": True,
-                    "schema": {
-                        "type": "string"
-                    }
-                }
+                data["name"]: data for data in OPENAPI_DEVICE_EXTRA["parameters"]
             }
         }
     }
 )
+
 
 api.add_router("/auth/v1/", auth_api)
 api.add_router("/device/v1/", vulnerability_api)

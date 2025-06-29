@@ -26,6 +26,6 @@ class DeviceTokenPayload(Schema):
     def is_same_device(request: HttpRequest, device_id: int):
         if not request.device_info:
             return False
-        return request.device_info.get("device_id") == device_id
+        return request.device_info.device_id == device_id
 
 
