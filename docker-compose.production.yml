@@ -1,5 +1,6 @@
 services:  
   django_admin:
+    hostname: authenticationservice
     build: .
     container_name: myportfolio-djangoadmin
     command: daphne -b 0.0.0.0 -p ${DJANGO_ADMIN_LOCAL_PORT} portfolio_django_admin.asgi:application
