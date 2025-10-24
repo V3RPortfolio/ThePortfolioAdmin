@@ -22,6 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env_path = os.path.join(BASE_DIR, '.env')
 if os.path.exists(env_path):
+    print("Loading .env file from:", env_path)
     load_dotenv(env_path)
 
 # Quick-start development settings - unsuitable for production

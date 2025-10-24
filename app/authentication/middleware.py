@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser, AbstractUser
 from django.contrib.auth import get_user_model
+from django.http import HttpRequest
 from asgiref.sync import sync_to_async
 from typing import Optional
 from jose import jwt
@@ -11,8 +12,21 @@ User = get_user_model()
 class AuthorizationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.skip_path_prefixes = [
+            '/admin',]
+        
 
-    def __call__(self, request):
+    def __can_skip_path(self, path: str) -> bool:
+        for prefix in self.skip_path_prefixes:
+            if path.startswith(prefix):
+                return True
+        return False
+
+    def __call__(self, request:HttpRequest):
+
+        if self.__can_skip_path(request.path):
+            return self.get_response(request)
+
         token = request.headers.get("Authorization", "")
         request.roles = []
         if not token:
