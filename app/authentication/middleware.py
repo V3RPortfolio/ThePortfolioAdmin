@@ -13,7 +13,10 @@ class AuthorizationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.skip_path_prefixes = [
-            '/admin',]
+            '/admin',
+            '/openid'
+        ]
+        
         
 
     def __can_skip_path(self, path: str) -> bool:

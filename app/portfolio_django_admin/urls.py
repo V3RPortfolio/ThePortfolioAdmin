@@ -48,6 +48,7 @@ urlpatterns = [
     path('', index, name='home'),
     path('admin/', admin.site.urls, name='admin'),
     path('csrf/', csrf, name='csrf'),
+    path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
     path('github/', include('github.urls')),
     path('api/', api.urls),
 ]

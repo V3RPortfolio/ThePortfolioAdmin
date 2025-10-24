@@ -72,6 +72,8 @@ INSTALLED_APPS = [
     
     'django.contrib.staticfiles',
     'corsheaders',
+    'oidc_provider',
+    
     'portfolio_django_admin',
     'github',
     'authentication',
