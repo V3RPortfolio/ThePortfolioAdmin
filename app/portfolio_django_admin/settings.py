@@ -238,7 +238,7 @@ SOCIALACCOUNT_PROVIDERS = {
         "authorization_url": "https://accounts.google.com/o/oauth2/auth",
         "access_token_url": "https://oauth2.googleapis.com/token",
         "userinfo_url": "https://openidconnect.googleapis.com/v1/userinfo",
-        "redirect_uri": "http://localhost:8000/api/auth/v1/oauth2/callback/google",
+        "redirect_uri": os.getenv('GOOGLE_OAUTH2_REDIRECT_URL', 'http://localhost:8000/api/auth/v1/oauth2/callback/google'),
     }
 }
 

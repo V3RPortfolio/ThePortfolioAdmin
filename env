@@ -23,6 +23,7 @@ GITHUB_PAT="12323"
 # Oauth2
 GOOGLE_OAUTH2_CLIENT_ID=""
 GOOGLE_OAUTH2_CLIENT_SECRET=""
+GOOGLE_OAUTH2_REDIRECT_URL="http://gateway.zohairmehtab.com/auth/v1/oauth2/callback/google"
 
 # Redis
 REDIS_HOST="localhost"
