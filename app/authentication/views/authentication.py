@@ -22,7 +22,7 @@ async def login(request, payload: TokenPayload):
     )
     
     refresh_token = create_refresh_token(
-        data={"sub": user.username},
+        username=user.username,
         expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     )
     
