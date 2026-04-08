@@ -41,14 +41,14 @@ def get_roles(user:AbstractUser)->list[RoleType]:
         roles = [RoleType.GUEST.value]
     return roles
 
-async def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
+async def get_access_token_payload(username:str, expires_delta: Optional[timedelta] = None)->dict:
+    to_encode = {"sub": username}
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    user = await get_user_model().objects.aget(username=data.get('sub'))
+    user = await get_user_model().objects.aget(username=username)
     
     # Get user roles from database
     roles = await get_roles(user)
@@ -61,8 +61,11 @@ async def create_access_token(data: dict, expires_delta: Optional[timedelta] = N
         "exp": expire,
         "roles": roles
     })
+    return to_encode
+
+async def create_access_token(username:str, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(
-        to_encode, 
+        await get_access_token_payload(username, expires_delta),
         settings.JWT_SECRET_KEY, 
         algorithm=settings.JWT_ALGORITHM
     )
@@ -75,8 +78,8 @@ def decode_token(token:str)->dict:
         algorithms=[settings.JWT_ALGORITHM]
     )
 
-def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
+def get_refresh_token_payload(username:str, expires_delta: Optional[timedelta]=None)->dict:
+    to_encode = {"sub": username}
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -86,9 +89,11 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
         "exp": expire,
         "token_type": "refresh"
     })
-    
+    return to_encode
+
+def create_refresh_token(username:str, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(
-        to_encode, 
+        get_refresh_token_payload(username, expires_delta),
         settings.JWT_REFRESH_SECRET_KEY, 
         algorithm=settings.JWT_ALGORITHM
     )
@@ -107,11 +112,7 @@ def verify_refresh_token(refresh_token: str) -> Optional[dict]:
     except JWTError:
         return None
 
-def create_device_token(device_data: dict, expires_delta: Optional[timedelta] = None):
-    """
-    Create a JWT token for device authentication
-    device_data should contain device identifiers like mac_address, device_id, etc.
-    """
+def get_device_token_payload(device_data:dict, expires_delta: Optional[timedelta] = None)->dict:
     to_encode = device_data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -124,9 +125,14 @@ def create_device_token(device_data: dict, expires_delta: Optional[timedelta] = 
         "token_type": "device",
         "iat": datetime.utcnow()  # issued at time
     })
-    
+
+def create_device_token(device_data: dict, expires_delta: Optional[timedelta] = None):
+    """
+    Create a JWT token for device authentication
+    device_data should contain device identifiers like mac_address, device_id, etc.
+    """
     encoded_jwt = jwt.encode(
-        to_encode, 
+        get_device_token_payload(device_data, expires_delta),
         settings.DEVICE_TOKEN_KEY, 
         algorithm=settings.JWT_ALGORITHM
     )

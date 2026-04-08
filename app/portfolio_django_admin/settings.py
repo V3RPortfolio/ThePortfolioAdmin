@@ -72,12 +72,12 @@ INSTALLED_APPS = [
     
     'django.contrib.staticfiles',
     'corsheaders',
-    'oidc_provider',
     
     'portfolio_django_admin',
     'github',
     'authentication',
-    'vulnerability_analysis',
+    # 'vulnerability_analysis',
+    
 ]
 
 MIDDLEWARE = [
@@ -150,8 +150,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -226,6 +224,23 @@ DEVICE_TOKEN_KEY = os.getenv('DEVICE_TOKEN_KEY', SECRET_KEY)
 JWT_ALGORITHM = 'HS256'
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', "300"))
 JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7  # Refresh token valid for 7 days
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'client_id': '785953836060-aakadl0l7kaqnr01p8i0lpua03sbilk8.apps.googleusercontent.com',
+        'client_secret': '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',
+        "scope": [
+            "email",
+            "profile",
+            "openid",
+        ],
+        "authorization_url": "https://accounts.google.com/o/oauth2/auth",
+        "access_token_url": "https://oauth2.googleapis.com/token",
+        "userinfo_url": "https://openidconnect.googleapis.com/v1/userinfo",
+        "redirect_uri": "http://localhost:8000/api/auth/v1/oauth2/callback/google",
+    }
+}
 
 # Device Token Settings
 DEVICE_TOKEN_EXPIRATION = os.getenv('DEVICE_TOKEN_EXPIRATION', 3600)

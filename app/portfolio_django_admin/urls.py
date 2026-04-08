@@ -18,8 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from portfolio_django_admin.views import index, csrf
 from authentication.urls import router as auth_api
-from authentication.services.auth import AuthBearer, DeviceBearer
-from vulnerability_analysis.urls import router as vulnerability_api
+from authentication.services.auth import AuthBearer
+# from vulnerability_analysis.urls import router as vulnerability_api
 from django.conf import settings
 from ninja import NinjaAPI, Redoc, Swagger  
 from .constants import OPENAPI_DEVICE_EXTRA
@@ -42,13 +42,12 @@ api = NinjaAPI(
 
 
 api.add_router("/auth/v1/", auth_api)
-api.add_router("/device/v1/", vulnerability_api)
+# api.add_router("/device/v1/", vulnerability_api)
 
 urlpatterns = [
     path('', index, name='home'),
     path('admin/', admin.site.urls, name='admin'),
     path('csrf/', csrf, name='csrf'),
-    path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
     path('github/', include('github.urls')),
     path('api/', api.urls),
 ]
