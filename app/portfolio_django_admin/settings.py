@@ -228,8 +228,8 @@ JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7  # Refresh token valid for 7 days
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'client_id': '785953836060-aakadl0l7kaqnr01p8i0lpua03sbilk8.apps.googleusercontent.com',
-        'client_secret': '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',
+        'client_id': '',
+        'client_secret': '',
         "scope": [
             "email",
             "profile",
