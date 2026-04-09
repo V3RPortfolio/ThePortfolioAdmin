@@ -46,7 +46,7 @@ class Oauth2Service:
         _authorization_url = provider.authorization_url(self._authorization_url)
         return _authorization_url[0]
     
-    async def process_callback_code(self, state:str|None, code:str|None)->GoogleOauth2Token:
+    async def process_callback_code(self, state:str|None, code:str|None, redirect_uri:str|None=None)->GoogleOauth2Token:
         """
         Receives a code from the callback url and exchanges it for a access 
         token.
@@ -55,10 +55,12 @@ class Oauth2Service:
         @param code: The code returned by the provider
         returns Access token
         """
+        if not redirect_uri or len(redirect_uri) == 0:
+            redirect_uri = self._redirect_uri
         provider = OAuth2Session(
             client_id=self._client_id, 
             state=state,
-            redirect_uri=self._redirect_uri
+            redirect_uri=redirect_uri
         )
         token = provider.fetch_token(
             self._access_token_url,

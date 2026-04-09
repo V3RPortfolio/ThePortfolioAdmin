@@ -26,6 +26,7 @@ async def google_oauth(request:HttpRequest):
     scope = request.GET.get("scope", "")
     state = request.GET.get("state", "")
     error = request.GET.get("error", "")
+    redirect_uri = request.GET.get("redirect", "")
 
     logger.info(f"Received Google OAuth callback with code: {code}, scope: {scope}, state: {state}, error: {error}")
 
@@ -34,7 +35,7 @@ async def google_oauth(request:HttpRequest):
    
     oauth2_service = Oauth2Service(provider="google")
     try:
-        token = await oauth2_service.process_callback_code(state=state, code=code)
+        token = await oauth2_service.process_callback_code(state=state, code=code, redirect_uri=redirect_uri)
 
         if not token.access_token:
             raise ValueError("Failed to obtain access token from Google OAuth callback.")
