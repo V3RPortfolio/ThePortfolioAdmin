@@ -5,7 +5,7 @@ from django.conf import settings
 from datetime import timedelta
 from django.contrib.auth import get_user_model
 from authentication.services import Oauth2Service, create_access_token, create_refresh_token
-from authentication.schemas import GoogleOauth2Info, AuthResponse
+from authentication.schemas import GoogleOauth2Info, AuthResponse, GoogleOAuth2RedirectUrlPayload
 
 
 import logging
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 router = Router()
 
-@router.get("/login/google", auth=None, response={200: dict})
+@router.get("/login/google", auth=None, response={200: GoogleOAuth2RedirectUrlPayload})
 async def google_oauth_login(request):
     oauth2_service = Oauth2Service(provider="google")
     redirect_url = await oauth2_service.get_redirect_url()

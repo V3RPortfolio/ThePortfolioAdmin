@@ -28,7 +28,8 @@ class DeviceTokenPayload(Schema):
             return False
         return request.device_info.device_id == device_id
 
-
+class GoogleOAuth2RedirectUrlPayload(Schema):
+    redirect_url: str
 class GoogleOauth2Token(Schema):
     access_token: str
     id_token: Optional[str] = None
