@@ -1,45 +1,20 @@
 services:  
   django_admin:
     hostname: authenticationservice
-    build: .
+    build:
+      context: ./portfolio_django_admin
+      dockerfile: Dockerfile
     container_name: myportfolio-djangoadmin
-    command: daphne -b 0.0.0.0 -p ${DJANGO_ADMIN_LOCAL_PORT} portfolio_django_admin.asgi:application
+    command: uv run daphne -b 0.0.0.0 -p ${DJANGO_ADMIN_LOCAL_PORT:-8000} portfolio_django_admin.asgi:application
     volumes:
-      - ./app:/app
+      - ./portfolio_django_admin/src:/usr/local/app/src
     ports:
-      - "${DJANGO_ADMIN_HOST_PORT}:${DJANGO_ADMIN_LOCAL_PORT}"
-      - 3000:4000
+      - "${DJANGO_ADMIN_HOST_PORT:-8000}:${DJANGO_ADMIN_LOCAL_PORT:-8000}"
 
     networks:
       - platform_net
-
     restart: "always"
-
     env_file: "./.env"
-    environment:
-      - POSTGRES_DB=${DJANGO_ADMIN_DB_NAME}
-      - POSTGRES_USER=${DJANGO_ADMIN_DB_USER}
-      - POSTGRES_PASSWORD=${DJANGO_ADMIN_DB_PASSWORD}
-      - POSTGRES_HOST=${DJANGO_ADMIN_DB_HOST}
-      - POSTGRES_PORT=${DJANGO_ADMIN_DB_PORT}
-
-      - DEBUG=False
-      - SECRET_KEY=${DJANGO_ADMIN_SERVICE_SECRET_KEY}
-      - ALLOWED_HOSTS=${DJANGO_ADMIN_SERVICE_ALLOWED_HOSTS}
-      - TRUSTED_ORIGINS=${DJANGO_ADMIN_CSRF_TRUSTED_ORIGIN}
-
-      - GITHUB_PAT=${GITHUB_PAT}
-
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_USER=${REDIS_USER}
-
-      - JWT_SECRET_KEY=${DJANGO_JWT_SECRET_KEY}
-      - JWT_REFRESH_SECRET_KEY=${DJANGO_JWT_REFRESH_SECRET_KEY}
-      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=${DJANGO_JWT_ACCESS_TOKEN_EXPIRE_MINUTES}
-      - DEVICE_TOKEN_KEY=${DJANGO_DEVICE_TOKEN_KEY}
-      - DEVICE_TOKEN_EXPIRATION=${DJANGO_DEVICE_TOKEN_EXPIRATION}
 networks:
   platform_net:
     driver: bridge

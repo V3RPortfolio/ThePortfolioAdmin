@@ -102,6 +102,8 @@ echo "Unzipping the file in the server"
 ssh -i $ssh_key $server "unzip $temp_directory_name.zip -d ~/"
 
 # 5. Move the contents inside the unzipped folder to remote server application directory. Create the directory if it does not exist.
+echo "Remove existing python files in the remote server application directory"
+ssh -i $ssh_key $server "if [ -d $remote_server_application_directory ]; then find $remote_server_application_directory -type f -name '*' -delete; else echo 'The application directory does not exist. Creating the application directory'; mkdir -p $remote_server_application_directory; fi"
 echo "Moving the contents inside the unzipped folder to remote server application directory"
 ssh -i $ssh_key $server "cp ~/$temp_directory_name/* $remote_server_application_directory/ -r && cp ~/$temp_directory_name/.env $remote_server_application_directory/ -r && rm -rf ~/$temp_directory_name"
 

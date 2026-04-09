@@ -72,4 +72,4 @@ development/
 **/o365_token.txt
 
 # Django
-app/staticfiles
+portfolio_django_admin/src/staticfiles
