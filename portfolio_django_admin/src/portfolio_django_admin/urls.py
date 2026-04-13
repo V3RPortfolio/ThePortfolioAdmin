@@ -19,6 +19,7 @@ from django.urls import path, include
 from portfolio_django_admin.views import index, csrf
 from authentication.urls import router as auth_api
 from authentication.services.auth import AuthBearer
+from organization.urls import router as organization_api
 # from vulnerability_analysis.urls import router as vulnerability_api
 from django.conf import settings
 from ninja import NinjaAPI, Redoc, Swagger  
@@ -42,6 +43,7 @@ api = NinjaAPI(
 
 
 api.add_router("/auth/v1/", auth_api)
+api.add_router("/organization/v1/", organization_api)
 # api.add_router("/device/v1/", vulnerability_api)
 
 urlpatterns = [
