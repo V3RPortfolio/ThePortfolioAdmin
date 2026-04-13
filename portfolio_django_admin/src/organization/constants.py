@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Literal
 
 
 class OrganizationRoleType(str, Enum):
@@ -9,8 +8,6 @@ class OrganizationRoleType(str, Enum):
     EDITOR = "editor"
     VIEWER = "viewer"
 
-
-OrganizationRoleLiteral = Literal["admin", "owner", "manager", "editor", "viewer"]
 
 ORG_ADMIN_ROLES = [OrganizationRoleType.OWNER.value, OrganizationRoleType.ADMIN.value]
 ORG_MANAGEMENT_ROLES = [

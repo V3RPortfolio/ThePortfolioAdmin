@@ -2,7 +2,7 @@ from ninja import Schema
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
-from organization.constants import OrganizationRoleLiteral
+from organization.constants import OrganizationRoleType
 
 
 class OrganizationIn(Schema):
@@ -22,11 +22,11 @@ class OrganizationOut(Schema):
 
 class OrganizationUserIn(Schema):
     email: str
-    role: OrganizationRoleLiteral = "viewer"
+    role: OrganizationRoleType = OrganizationRoleType.VIEWER
 
 
 class OrganizationUserUpdateIn(Schema):
-    role: OrganizationRoleLiteral
+    role: OrganizationRoleType
 
 
 class OrganizationUserOut(Schema):
