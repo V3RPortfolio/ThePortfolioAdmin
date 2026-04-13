@@ -1,11 +1,8 @@
 from ninja import Schema
-from typing import List, Optional
-from typing import Literal
+from typing import Optional
 from uuid import UUID
 from datetime import datetime
-
-
-OrganizationRoleLiteral = Literal["admin", "owner", "manager", "editor", "viewer"]
+from organization.constants import OrganizationRoleLiteral
 
 
 class OrganizationIn(Schema):
@@ -24,7 +21,7 @@ class OrganizationOut(Schema):
 
 
 class OrganizationUserIn(Schema):
-    username: str
+    email: str
     role: OrganizationRoleLiteral = "viewer"
 
 
@@ -35,14 +32,14 @@ class OrganizationUserUpdateIn(Schema):
 class OrganizationUserOut(Schema):
     id: int
     organization_id: UUID
-    username: str
+    email: str
     role: str
     created_at: datetime
     updated_at: datetime
 
     @staticmethod
-    def resolve_username(obj):
-        return obj.user.username
+    def resolve_email(obj):
+        return obj.user.email
 
 
 class ErrorMessage(Schema):

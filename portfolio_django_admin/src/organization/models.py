@@ -1,15 +1,7 @@
-from enum import Enum
 from django.db import models
 from django.conf import settings
 import uuid
-
-
-class OrganizationRoleType(str, Enum):
-    ADMIN = "admin"
-    OWNER = "owner"
-    MANAGER = "manager"
-    EDITOR = "editor"
-    VIEWER = "viewer"
+from organization.constants import OrganizationRoleType
 
 
 class Organization(models.Model):

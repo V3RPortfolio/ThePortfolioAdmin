@@ -1,4 +1,6 @@
 from .organization import (
+    get_user_id_by_email,
+    get_user_by_email,
     create_organization,
     get_user_organizations,
     get_organization,
@@ -9,13 +11,14 @@ from .organization import (
     add_organization_user,
     update_organization_user_role,
     remove_organization_user,
-    get_user_by_username,
     ORG_ADMIN_ROLES,
     ORG_MANAGEMENT_ROLES,
     VALID_ROLES,
 )
 
 __all__ = [
+    "get_user_id_by_email",
+    "get_user_by_email",
     "create_organization",
     "get_user_organizations",
     "get_organization",
@@ -26,7 +29,6 @@ __all__ = [
     "add_organization_user",
     "update_organization_user_role",
     "remove_organization_user",
-    "get_user_by_username",
     "ORG_ADMIN_ROLES",
     "ORG_MANAGEMENT_ROLES",
     "VALID_ROLES",

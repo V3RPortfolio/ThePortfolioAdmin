@@ -1,45 +1,51 @@
 from django.contrib.auth import get_user_model
-from organization.models import Organization, OrganizationUser, OrganizationRoleType
+from organization.models import Organization, OrganizationUser
+from organization.constants import (
+    OrganizationRoleType,
+    ORG_ADMIN_ROLES,
+    ORG_MANAGEMENT_ROLES,
+    VALID_ROLES,
+)
 from asgiref.sync import sync_to_async
 from typing import Optional, List, Tuple
 from uuid import UUID
 
 User = get_user_model()
 
-ORG_ADMIN_ROLES = [OrganizationRoleType.OWNER.value, OrganizationRoleType.ADMIN.value]
-ORG_MANAGEMENT_ROLES = [
-    OrganizationRoleType.OWNER.value,
-    OrganizationRoleType.ADMIN.value,
-    OrganizationRoleType.MANAGER.value,
-]
-VALID_ROLES = [role.value for role in OrganizationRoleType]
-
 
 @sync_to_async
-def get_user_by_username(username: str):
+def get_user_id_by_email(email: str) -> Optional[int]:
     try:
-        return User.objects.get(username=username)
+        return User.objects.values_list('id', flat=True).get(email=email)
     except User.DoesNotExist:
         return None
 
 
 @sync_to_async
-def create_organization(name: str, creator_user) -> Tuple[Optional[Organization], Optional[str]]:
+def get_user_by_email(email: str):
+    try:
+        return User.objects.get(email=email)
+    except User.DoesNotExist:
+        return None
+
+
+@sync_to_async
+def create_organization(name: str, creator_user_id: int) -> Tuple[Optional[Organization], Optional[str]]:
     if Organization.objects.filter(name=name).exists():
         return None, "name_taken"
     org = Organization.objects.create(name=name)
     OrganizationUser.objects.create(
         organization=org,
-        user=creator_user,
+        user_id=creator_user_id,
         role=OrganizationRoleType.OWNER.value,
     )
     return org, None
 
 
 @sync_to_async
-def get_user_organizations(user) -> List[Organization]:
+def get_user_organizations(user_id: int) -> List[Organization]:
     return list(
-        Organization.objects.filter(organization_users__user=user).order_by('name')
+        Organization.objects.filter(organization_users__user_id=user_id).order_by('name')
     )
 
 
@@ -75,9 +81,9 @@ def delete_organization(org_id: UUID) -> bool:
 
 
 @sync_to_async
-def get_organization_user_role(org_id: UUID, user) -> Optional[str]:
+def get_organization_user_role(org_id: UUID, user_id: int) -> Optional[str]:
     try:
-        org_user = OrganizationUser.objects.get(organization_id=org_id, user=user)
+        org_user = OrganizationUser.objects.get(organization_id=org_id, user_id=user_id)
         return org_user.role
     except OrganizationUser.DoesNotExist:
         return None
@@ -94,10 +100,10 @@ def list_organization_users(org_id: UUID) -> List[OrganizationUser]:
 
 @sync_to_async
 def add_organization_user(
-    org_id: UUID, username: str, role: str
+    org_id: UUID, email: str, role: str
 ) -> Tuple[Optional[OrganizationUser], Optional[str]]:
     try:
-        user = User.objects.get(username=username)
+        user = User.objects.get(email=email)
     except User.DoesNotExist:
         return None, "user_not_found"
 
@@ -116,11 +122,11 @@ def add_organization_user(
 
 @sync_to_async
 def update_organization_user_role(
-    org_id: UUID, username: str, role: str
+    org_id: UUID, email: str, role: str
 ) -> Tuple[Optional[OrganizationUser], Optional[str]]:
     try:
         org_user = OrganizationUser.objects.select_related('user').get(
-            organization_id=org_id, user__username=username
+            organization_id=org_id, user__email=email
         )
         org_user.role = role
         org_user.save()
@@ -131,11 +137,11 @@ def update_organization_user_role(
 
 @sync_to_async
 def remove_organization_user(
-    org_id: UUID, username: str
+    org_id: UUID, email: str
 ) -> Tuple[bool, Optional[str]]:
     try:
         org_user = OrganizationUser.objects.get(
-            organization_id=org_id, user__username=username
+            organization_id=org_id, user__email=email
         )
         if org_user.role in ORG_ADMIN_ROLES:
             return False, "cannot_remove_admin_or_owner"
