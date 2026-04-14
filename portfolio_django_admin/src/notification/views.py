@@ -22,6 +22,9 @@ async def list_notifications(request, page: int = 1, page_size: int = 10):
     if not user_id:
         return 400, {"message": "User not found"}
 
+    page = max(1, page)
+    page_size = max(1, min(page_size, 100))
+
     items, total = await get_user_notifications(user_id, page, page_size)
     return 200, {
         "items": items,
@@ -39,6 +42,9 @@ async def list_unread_notifications(request, page: int = 1, page_size: int = 10)
     user_id = await get_user_id_by_username(request.auth["sub"])
     if not user_id:
         return 400, {"message": "User not found"}
+
+    page = max(1, page)
+    page_size = max(1, min(page_size, 100))
 
     items, total = await get_user_unread_notifications(user_id, page, page_size)
     return 200, {
