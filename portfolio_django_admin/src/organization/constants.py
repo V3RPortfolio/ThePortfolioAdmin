@@ -28,5 +28,5 @@ CACHE_KEY_PREFIX = "org_role_cache"
 CACHE_TIMEOUT = 86400  # 24 hours
 
 
-def build_cache_key(organization_id: UUID, email: str) -> str:
-    return f"{CACHE_KEY_PREFIX}__{organization_id}__{email}"
+def build_cache_key(organization_id: UUID, username: str) -> str:
+    return f"{CACHE_KEY_PREFIX}__{organization_id}__{username}"
