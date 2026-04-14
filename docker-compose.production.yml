@@ -15,6 +15,21 @@ services:
       - platform_net
     restart: "always"
     env_file: "./.env"
+
+  celery_worker:
+    build:
+      context: ./portfolio_django_admin
+      dockerfile: Dockerfile
+    hostname: celeryworker
+    container_name: celery-worker
+    env_file:
+      - ./.env
+    networks:
+      - platform_net
+    volumes:
+      - ./portfolio_django_admin/src:/usr/local/app/src
+    command: uv run celery -A portfolio_django_admin.celery worker --loglevel=info
+
 networks:
   platform_net:
     driver: bridge

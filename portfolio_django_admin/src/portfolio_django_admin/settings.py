@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'github',
     'authentication',
     'organization',
+    'notification'
     
 ]
 
@@ -161,6 +162,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 # Static files (CSS, JavaScript, Images)
@@ -196,9 +198,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Cache
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = os.getenv('REDIS_PORT', '6379')
-REDIS_USERNAME = os.getenv('REDIS_USERNAME', 'redis')
+REDIS_USERNAME = os.getenv('REDIS_USER', 'redis')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'redis')
 REDIS_PATH = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+
+# Broker
+CELERY_BROKER_URL = f"redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/2"
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
+CELERY_TASKS_ACKS_LATE = True
+CELERY_TASK_TIME_LIMIT = 3600  # 60 minutes
 
 # Redis
 CACHES = {
