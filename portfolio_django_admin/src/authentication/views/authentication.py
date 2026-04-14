@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.conf import settings
 from asgiref.sync import sync_to_async
 
-router = Router()
+router = Router(tags=["Authentication"])
 
 
 authenticate_user= sync_to_async(authenticate)

@@ -1,9 +1,9 @@
 from ninja import Router
 from authentication.schemas import ErrorMessage
 from authentication.decorators import require_roles, require_device_token
-from authentication.models import RoleType
+from authentication.constants import RoleType
 
-router = Router()
+router = Router(tags=["Examples"])
 
 
 @router.get("/me", response={200: dict, 401: ErrorMessage})

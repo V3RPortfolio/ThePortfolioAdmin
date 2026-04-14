@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'portfolio_django_admin',
     'github',
     'authentication',
+    'organization',
     # 'vulnerability_analysis',
     
 ]

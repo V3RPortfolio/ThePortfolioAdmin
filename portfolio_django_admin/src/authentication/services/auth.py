@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
-from authentication.models import UserRole, RoleType
+from authentication.models import UserRole
+from authentication.constants import RoleType
 from asgiref.sync import sync_to_async
 
 

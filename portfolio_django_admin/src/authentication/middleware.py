@@ -1,11 +1,9 @@
 from django.contrib.auth.models import AnonymousUser, AbstractUser
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
-from asgiref.sync import sync_to_async
 from typing import Optional
-from jose import jwt
-from django.conf import settings
 from authentication.models import UserRole
+from authentication.services import decode_token
 
 User = get_user_model()
 
@@ -40,7 +38,8 @@ class AuthorizationMiddleware:
             request.user = AnonymousUser()
             return self.get_response(request)
         try:
-            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+
+            payload = decode_token(token)
             user = self.get_user(payload.get("sub"))
             request.user = user
             request.roles = [role.role for role in UserRole.objects.filter(user=user)]
