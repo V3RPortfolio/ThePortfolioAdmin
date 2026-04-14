@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from organization.models import Organization, OrganizationUser
 from authentication.constants import (
     OrganizationRoleType,
@@ -13,6 +14,12 @@ from typing import Optional, List, Tuple
 from uuid import UUID
 
 User = get_user_model()
+
+CACHE_KEY_PREFIX = "org_role_cache"
+
+
+def _build_cache_key(organization_id: UUID, email: str) -> str:
+    return f"{CACHE_KEY_PREFIX}__{organization_id}__{email}"
 
 
 @sync_to_async
@@ -161,6 +168,9 @@ def update_organization_user_role(
         )
         org_user.role = role
         org_user.save()
+        cache_key = _build_cache_key(org_id, email)
+        if cache.get(cache_key) is not None:
+            cache.set(cache_key, role)
         return org_user, None
     except OrganizationUser.DoesNotExist:
         return None, "user_not_found"
@@ -177,6 +187,27 @@ def remove_organization_user(
         if org_user.role in ORG_ADMIN_ROLES:
             return False, "cannot_remove_admin_or_owner"
         org_user.delete()
+        cache.delete(_build_cache_key(org_id, email))
         return True, None
     except OrganizationUser.DoesNotExist:
         return False, "user_not_found"
+
+
+@sync_to_async
+def select_organization(
+    user_id: int, organization_id: UUID
+) -> Tuple[Optional[str], Optional[str]]:
+    try:
+        org_user = OrganizationUser.objects.exclude(
+            organization__status=OrganizationStatus.DELETED.value
+        ).select_related('user').get(
+            organization_id=organization_id, user_id=user_id
+        )
+    except OrganizationUser.DoesNotExist:
+        return None, "user_not_in_organization"
+
+    role = org_user.role
+    email = org_user.user.email
+    cache_key = _build_cache_key(organization_id, email)
+    cache.set(cache_key, role)
+    return role, None
