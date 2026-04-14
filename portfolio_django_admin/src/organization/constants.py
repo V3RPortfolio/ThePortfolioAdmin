@@ -1,4 +1,6 @@
 from enum import Enum
+from uuid import UUID
+
 
 class OrganizationStatus(str, Enum):
     ACTIVE = "active"
@@ -21,3 +23,10 @@ class UserInvitationStatus(str, Enum):
     PENDING = "pending"
     ACCEPTED = "accepted"
     DECLINED = "declined"
+
+CACHE_KEY_PREFIX = "org_role_cache"
+CACHE_TIMEOUT = 86400  # 24 hours
+
+
+def build_cache_key(organization_id: UUID, email: str) -> str:
+    return f"{CACHE_KEY_PREFIX}__{organization_id}__{email}"

@@ -7,20 +7,15 @@ from authentication.constants import (
 )
 from organization.constants import (
     OrganizationStatus,
-    UserInvitationStatus
+    UserInvitationStatus,
+    CACHE_TIMEOUT,
+    build_cache_key,
 )
 from asgiref.sync import sync_to_async
 from typing import Optional, List, Tuple
 from uuid import UUID
 
 User = get_user_model()
-
-CACHE_KEY_PREFIX = "org_role_cache"
-CACHE_TIMEOUT = 86400  # 24 hours
-
-
-def _build_cache_key(organization_id: UUID, email: str) -> str:
-    return f"{CACHE_KEY_PREFIX}__{organization_id}__{email}"
 
 
 @sync_to_async
@@ -169,7 +164,7 @@ def update_organization_user_role(
         )
         org_user.role = role
         org_user.save()
-        cache_key = _build_cache_key(org_id, email)
+        cache_key = build_cache_key(org_id, org_user.user.username)
         if cache.get(cache_key) is not None:
             cache.set(cache_key, role, CACHE_TIMEOUT)
         return org_user, None
@@ -182,13 +177,14 @@ def remove_organization_user(
     org_id: UUID, email: str
 ) -> Tuple[bool, Optional[str]]:
     try:
-        org_user = OrganizationUser.objects.exclude(organization__status=OrganizationStatus.DELETED.value).get(
+        org_user = OrganizationUser.objects.exclude(organization__status=OrganizationStatus.DELETED.value).select_related('user').get(
             organization_id=org_id, user__email=email
         )
         if org_user.role in ORG_ADMIN_ROLES:
             return False, "cannot_remove_admin_or_owner"
+        username = org_user.user.username
         org_user.delete()
-        cache.delete(_build_cache_key(org_id, email))
+        cache.delete(build_cache_key(org_id, username))
         return True, None
     except OrganizationUser.DoesNotExist:
         return False, "user_not_found"
@@ -208,7 +204,7 @@ def select_organization(
         return None, "user_not_in_organization"
 
     role = org_user.role
-    email = org_user.user.email
-    cache_key = _build_cache_key(organization_id, email)
+    username = org_user.user.username
+    cache_key = build_cache_key(organization_id, username)
     cache.set(cache_key, role, CACHE_TIMEOUT)
     return role, None

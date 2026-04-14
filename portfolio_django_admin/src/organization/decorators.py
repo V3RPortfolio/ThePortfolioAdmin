@@ -28,13 +28,13 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
         if is_function_async(func):
             @wraps(func)
             async def wrapper(request, org_id: UUID, *args, **kwargs):
-                from organization.services.organization import _build_cache_key
+                from organization.constants import build_cache_key
 
-                email = request.auth.get("sub") if request.auth else None
-                if not email:
+                username = request.auth.get("sub") if request.auth else None
+                if not username:
                     return JsonResponse({"detail": "Authentication required"}, status=401)
 
-                cache_key = _build_cache_key(org_id, email)
+                cache_key = build_cache_key(org_id, username)
                 role = cache.get(cache_key)
                 if role is None:
                     return JsonResponse(
@@ -52,13 +52,13 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
         else:
             @wraps(func)
             def wrapper(request, org_id: UUID, *args, **kwargs):
-                from organization.services.organization import _build_cache_key
+                from organization.constants import build_cache_key
 
-                email = request.auth.get("sub") if request.auth else None
-                if not email:
+                username = request.auth.get("sub") if request.auth else None
+                if not username:
                     return JsonResponse({"detail": "Authentication required"}, status=401)
 
-                cache_key = _build_cache_key(org_id, email)
+                cache_key = build_cache_key(org_id, username)
                 role = cache.get(cache_key)
                 if role is None:
                     return JsonResponse(
