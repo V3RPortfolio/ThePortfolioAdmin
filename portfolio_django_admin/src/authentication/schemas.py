@@ -16,18 +16,6 @@ class RefreshTokenPayload(Schema):
 
 class ErrorMessage(Schema):
     message: str
-
-class DeviceTokenPayload(Schema):
-    device_id: str
-    device_name: str
-    device_mac: str
-
-    @staticmethod
-    def is_same_device(request: HttpRequest, device_id: int):
-        if not request.device_info:
-            return False
-        return request.device_info.device_id == device_id
-
 class GoogleOAuth2RedirectUrlPayload(Schema):
     redirect_url: str
 class GoogleOauth2Token(Schema):

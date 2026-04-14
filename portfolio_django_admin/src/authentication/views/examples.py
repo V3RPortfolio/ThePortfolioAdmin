@@ -1,6 +1,6 @@
 from ninja import Router
 from authentication.schemas import ErrorMessage
-from authentication.decorators import require_roles, require_device_token
+from authentication.decorators import require_roles
 from authentication.constants import RoleType
 
 router = Router(tags=["Examples"])
@@ -16,21 +16,3 @@ async def me(request):
 async def protected_route(request):
     return {"message": f"Hello {request.auth['sub']}! This is a protected endpoint"}
 
-@router.get("/protected-device", response={200: dict, 401: ErrorMessage})
-@require_device_token()
-async def protected_device_route(request):
-    return {
-        "message": "Device authenticated successfully",
-        "device_info": request.device_info
-    }
-
-# Example using combined device and role authentication
-@router.get("/protected-device-admin", response={200: dict, 401: ErrorMessage})
-@require_roles([RoleType.ADMIN])
-@require_device_token()
-async def protected_device_admin_route(request):
-    return {
-        "message": "Device and admin role authenticated successfully",
-        "device_info": request.device_info,
-        "username": request.auth['sub']
-    }

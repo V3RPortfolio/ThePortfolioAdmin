@@ -56,7 +56,6 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
     'cookie',
-    constants.DEVICE_TOKEN_HEADER.lower(),
 ]
 
 # Application definition
@@ -77,7 +76,6 @@ INSTALLED_APPS = [
     'github',
     'authentication',
     'organization',
-    # 'vulnerability_analysis',
     
 ]
 
@@ -221,7 +219,6 @@ SESSION_CACHE_ALIAS = 'default'
 # JWT Settings
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
 JWT_REFRESH_SECRET_KEY = os.getenv('JWT_REFRESH_SECRET_KEY', SECRET_KEY)
-DEVICE_TOKEN_KEY = os.getenv('DEVICE_TOKEN_KEY', SECRET_KEY)
 JWT_ALGORITHM = 'HS256'
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', "300"))
 JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7  # Refresh token valid for 7 days
@@ -242,9 +239,6 @@ SOCIALACCOUNT_PROVIDERS = {
         "redirect_uri": os.getenv('GOOGLE_OAUTH2_REDIRECT_URL', 'http://localhost:8000/api/auth/v1/oauth2/callback/google'),
     }
 }
-
-# Device Token Settings
-DEVICE_TOKEN_EXPIRATION = os.getenv('DEVICE_TOKEN_EXPIRATION', 3600)
 
 
 LOGGING = {

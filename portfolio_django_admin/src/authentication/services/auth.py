@@ -23,18 +23,6 @@ class AuthBearer(HttpBearer):
         except JWTError:
             return None
         
-class DeviceBearer(HttpBearer):
-    async def authenticate(self, request, token):
-        try:
-            payload = jwt.decode(
-                token, 
-                settings.DEVICE_TOKEN_KEY, 
-                algorithms=[settings.JWT_ALGORITHM] 
-            )
-            return payload
-        except JWTError:
-            return None
-        
 @sync_to_async
 def get_roles(user:AbstractUser)->list[RoleType]:
     roles = list(UserRole.objects.filter(user=user).values_list('role', flat=True))
@@ -108,48 +96,6 @@ def verify_refresh_token(refresh_token: str) -> Optional[dict]:
             algorithms=[settings.JWT_ALGORITHM]
         )
         if payload.get("token_type") != "refresh":
-            return None
-        return payload
-    except JWTError:
-        return None
-
-def get_device_token_payload(device_data:dict, expires_delta: Optional[timedelta] = None)->dict:
-    to_encode = device_data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        # Default to 30 days for device tokens
-        expire = datetime.utcnow() + timedelta(days=settings.DEVICE_TOKEN_EXPIRATION)
-    
-    to_encode.update({
-        "exp": expire,
-        "token_type": "device",
-        "iat": datetime.utcnow()  # issued at time
-    })
-
-def create_device_token(device_data: dict, expires_delta: Optional[timedelta] = None):
-    """
-    Create a JWT token for device authentication
-    device_data should contain device identifiers like mac_address, device_id, etc.
-    """
-    encoded_jwt = jwt.encode(
-        get_device_token_payload(device_data, expires_delta),
-        settings.DEVICE_TOKEN_KEY, 
-        algorithm=settings.JWT_ALGORITHM
-    )
-    return encoded_jwt
-
-def verify_device_token(device_token: str) -> Optional[dict]:
-    """
-    Verify a device token and return its payload if valid
-    """
-    try:
-        payload = jwt.decode(
-            device_token,
-            settings.DEVICE_TOKEN_KEY,
-            algorithms=[settings.JWT_ALGORITHM]
-        )
-        if payload.get("token_type") != "device":
             return None
         return payload
     except JWTError:
