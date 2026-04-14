@@ -2,7 +2,7 @@ from functools import wraps
 import asyncio
 from typing import List, Union
 from uuid import UUID
-from organization.constants import OrganizationRoleType
+from authentication.constants import OrganizationRoleType
 from django.http import JsonResponse
 
 
@@ -24,18 +24,19 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
         if is_function_async(func):
             @wraps(func)
             async def wrapper(request, org_id: UUID, *args, **kwargs):
-                from organization.services import get_user_id_by_email, get_organization_user_role
+                
+                from organization.services import get_user_id_by_username, get_organization_user_role
 
-                email = request.auth.get("sub") if request.auth else None
-                if not email:
+                username = request.auth.get("sub") if request.auth else None
+                if not username:
                     return JsonResponse({"detail": "Authentication required"}, status=401)
 
-                user_id = await get_user_id_by_email(email)
+                user_id = await get_user_id_by_username(username)
                 if not user_id:
                     return JsonResponse({"detail": "User not found"}, status=401)
 
                 role = await get_organization_user_role(org_id, user_id)
-                if not role or role not in [r.value for r in allowed_roles]:
+                if not role or role not in [r for r in allowed_roles]:
                     return JsonResponse(
                         {"detail": "You don't have permission to perform this action"},
                         status=403,
@@ -64,7 +65,7 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
                 except OrganizationUser.DoesNotExist:
                     role = None
 
-                if not role or role not in [r.value for r in allowed_roles]:
+                if not role or role not in [r for r in allowed_roles]:
                     return JsonResponse(
                         {"detail": "You don't have permission to perform this action"},
                         status=403,

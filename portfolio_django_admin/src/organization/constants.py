@@ -1,27 +1,23 @@
 from enum import Enum
 
+class OrganizationStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    TRIAL = "trial"
+    DELETED = "deleted"
 
-class OrganizationRoleType(str, Enum):
-    ADMIN = "admin"
-    OWNER = "owner"
-    MANAGER = "manager"
-    EDITOR = "editor"
-    VIEWER = "viewer"
+class PaymentCurrency(str, Enum):
+    USD = "USD"
+    EUR = "EUR"
+    GBP = "GBP"
+    INR = "INR"
 
+class PaymentMethod(str, Enum):
+    CREDIT_CARD = "credit_card"
+    BANK_TRANSFER = "bank_transfer"
+    CREDITS = "credits"
 
-ORG_ADMIN_ROLES = [OrganizationRoleType.OWNER.value, OrganizationRoleType.ADMIN.value]
-ORG_MANAGEMENT_ROLES = [
-    OrganizationRoleType.OWNER.value,
-    OrganizationRoleType.ADMIN.value,
-    OrganizationRoleType.MANAGER.value,
-]
-VALID_ROLES = [role.value for role in OrganizationRoleType]
-OWNER_ASSIGNABLE_ROLES = [
-    OrganizationRoleType.MANAGER.value,
-    OrganizationRoleType.EDITOR.value,
-    OrganizationRoleType.VIEWER.value,
-]
-MANAGER_ASSIGNABLE_ROLES = [
-    OrganizationRoleType.EDITOR.value,
-    OrganizationRoleType.VIEWER.value,
-]
+class UserInvitationStatus(str, Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    DECLINED = "declined"

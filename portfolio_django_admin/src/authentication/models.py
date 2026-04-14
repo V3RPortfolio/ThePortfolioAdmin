@@ -1,11 +1,8 @@
 from enum import Enum
 from django.db import models
 from django.contrib.auth import get_user_model
+from authentication.constants import RoleType
 
-class RoleType(str, Enum):
-    ADMIN = "admin"
-    USER = "user"
-    GUEST = "guest"
 
 User = get_user_model()
 

@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-router = Router()
+router = Router(tags=["Oauth2 Authentication"])
 
 @router.get("/login/google", auth=None, response={200: GoogleOAuth2RedirectUrlPayload})
 async def google_oauth_login(request):

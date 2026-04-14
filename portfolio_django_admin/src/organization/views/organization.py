@@ -11,27 +11,28 @@ from organization.schemas import (
     ErrorMessage,
 )
 from organization.services import (
-    get_user_id_by_email,
+    get_user_id_by_username,
     create_organization,
     get_user_organizations,
     get_organization,
     update_organization,
     delete_organization,
     list_organization_users,
-    add_organization_user,
+    invite_organization_user,
     update_organization_user_role,
-    remove_organization_user,
-    ORG_ADMIN_ROLES,
+    remove_organization_user
 )
-from organization.constants import (
+from authentication.constants import (
     OrganizationRoleType,
+    ORG_ADMIN_ROLES,
     ORG_MANAGEMENT_ROLES,
     OWNER_ASSIGNABLE_ROLES,
     MANAGER_ASSIGNABLE_ROLES,
 )
+from authentication.services import AuthBearer
 from organization.decorators import require_org_roles
 
-router = Router()
+router = Router(tags=["Organization"], auth=AuthBearer())
 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +41,7 @@ router = Router()
 
 @router.post("/", response={201: OrganizationOut, 400: ErrorMessage, 409: ErrorMessage})
 async def create_org(request, payload: OrganizationIn):
-    user_id = await get_user_id_by_email(request.auth["sub"])
+    user_id = await get_user_id_by_username(request.auth["sub"])
     if not user_id:
         return 400, {"message": "User not found"}
 
@@ -53,7 +54,7 @@ async def create_org(request, payload: OrganizationIn):
 
 @router.get("/", response={200: List[OrganizationOut]})
 async def list_orgs(request):
-    user_id = await get_user_id_by_email(request.auth["sub"])
+    user_id = await get_user_id_by_username(request.auth["sub"])
     if not user_id:
         return 200, []
 
@@ -82,11 +83,9 @@ async def get_org(request, org_id: UUID):
 )
 @require_org_roles(ORG_ADMIN_ROLES)
 async def update_org(request, org_id: UUID, payload: OrganizationUpdateIn):
-    org, error = await update_organization(org_id, payload.name)
+    org, error = await update_organization(org_id, payload.description)
     if error == "not_found":
         return 404, {"message": "Organization not found"}
-    if error == "name_taken":
-        return 409, {"message": f"Organization with name '{payload.name}' already exists"}
 
     return 200, org
 
@@ -136,7 +135,7 @@ async def add_org_user(request, org_id: UUID, payload: OrganizationUserIn):
             "message": f"You cannot assign role '{payload.role}'. Allowed roles: {allowed_roles}"
         }
 
-    org_user, error = await add_organization_user(org_id, payload.email, payload.role)
+    org_user, error = await invite_organization_user(org_id, payload.email, payload.role)
     if error == "user_not_found":
         return 404, {"message": f"User '{payload.email}' not found"}
     if error == "org_not_found":
