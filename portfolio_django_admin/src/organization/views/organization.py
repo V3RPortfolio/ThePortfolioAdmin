@@ -20,7 +20,8 @@ from organization.services import (
     list_organization_users,
     invite_organization_user,
     update_organization_user_role,
-    remove_organization_user
+    remove_organization_user,
+    select_organization,
 )
 from authentication.constants import (
     OrganizationRoleType,
@@ -60,6 +61,19 @@ async def list_orgs(request):
 
     orgs = await get_user_organizations(user_id)
     return 200, orgs
+
+
+@router.post("/{org_id}/select", response={200: dict, 400: ErrorMessage, 404: ErrorMessage})
+async def select_org(request, org_id: UUID):
+    user_id = await get_user_id_by_username(request.auth["sub"])
+    if not user_id:
+        return 400, {"message": "User not found"}
+
+    role, error = await select_organization(user_id, org_id)
+    if error == "user_not_in_organization":
+        return 404, {"message": "User is not a member of this organization"}
+
+    return 200, {"message": "Organization selected successfully", "role": role}
 
 
 @router.get("/{org_id}", response={200: OrganizationOut, 403: ErrorMessage, 404: ErrorMessage})

@@ -12,6 +12,7 @@ from .organization import (
     invite_organization_user,
     update_organization_user_role,
     remove_organization_user,
+    select_organization,
 )
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "invite_organization_user",
     "update_organization_user_role",
     "remove_organization_user",
+    "select_organization",
 ]
