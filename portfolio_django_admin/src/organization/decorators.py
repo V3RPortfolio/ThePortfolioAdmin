@@ -38,7 +38,7 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
                 role = cache.get(cache_key)
                 if role is None:
                     return JsonResponse(
-                        {"detail": "You are not allowed to perform this action. Please select the organization first."},
+                        {"detail": "Organization not selected. Please select the organization first."},
                         status=403,
                     )
 
@@ -62,7 +62,7 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
                 role = cache.get(cache_key)
                 if role is None:
                     return JsonResponse(
-                        {"detail": "You are not allowed to perform this action. Please select the organization first."},
+                        {"detail": "Organization not selected. Please select the organization first."},
                         status=403,
                     )
 

@@ -16,6 +16,7 @@ from uuid import UUID
 User = get_user_model()
 
 CACHE_KEY_PREFIX = "org_role_cache"
+CACHE_TIMEOUT = 86400  # 24 hours
 
 
 def _build_cache_key(organization_id: UUID, email: str) -> str:
@@ -170,7 +171,7 @@ def update_organization_user_role(
         org_user.save()
         cache_key = _build_cache_key(org_id, email)
         if cache.get(cache_key) is not None:
-            cache.set(cache_key, role)
+            cache.set(cache_key, role, CACHE_TIMEOUT)
         return org_user, None
     except OrganizationUser.DoesNotExist:
         return None, "user_not_found"
@@ -209,5 +210,5 @@ def select_organization(
     role = org_user.role
     email = org_user.user.email
     cache_key = _build_cache_key(organization_id, email)
-    cache.set(cache_key, role)
+    cache.set(cache_key, role, CACHE_TIMEOUT)
     return role, None
