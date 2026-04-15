@@ -14,6 +14,10 @@ def create_notification(dto: PublishUserNotificationDTO) -> UserNotification:
         notification_type=dto.notification_type,
     )
 
+@sync_to_async
+def create_notification_async(dto: PublishUserNotificationDTO) -> UserNotification:
+    return create_notification(dto)
+
 
 @sync_to_async
 def get_user_notifications(user_id: int, page: int = 1, page_size: int = 10) -> Tuple[List[UserNotification], int]:
@@ -31,3 +35,10 @@ def get_user_unread_notifications(user_id: int, page: int = 1, page_size: int = 
     offset = (page - 1) * page_size
     items = list(queryset[offset:offset + page_size])
     return items, total
+
+@sync_to_async
+def mark_notifications_as_read(user_id: int, notification_ids: List[int]) -> int:
+    notifications =UserNotification.objects.filter(user_id=user_id, id__in=notification_ids).update(is_read=True) 
+    if notifications == 0:
+        raise ValueError("No notifications were marked as read. Please check the notification IDs and try again.")
+    return notifications

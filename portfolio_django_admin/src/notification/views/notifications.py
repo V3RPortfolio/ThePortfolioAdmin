@@ -6,6 +6,7 @@ from notification.schemas import (
 from notification.services import (
     get_user_notifications,
     get_user_unread_notifications,
+    mark_notifications_as_read
 )
 from organization.services import get_user_id_by_username
 from authentication.services import AuthBearer
@@ -53,3 +54,16 @@ async def list_unread_notifications(request, page: int = 1, page_size: int = 10)
         "page": page,
         "page_size": page_size,
     }
+
+@router.post(
+    "/mark-read",
+    response={200: {"message": str}, 400: ErrorMessage},
+)
+async def mark_notifications_as_read(request, notification_ids: list[int]):
+    user_id = await get_user_id_by_username(request.auth["sub"])
+    if not user_id:
+        return 400, {"message": "User not found"}
+
+    total = await mark_notifications_as_read(user_id, notification_ids)
+
+    return 200, {"message": f"{total} notifications marked as read"}

@@ -15,6 +15,12 @@ class NotificationOut(Schema):
     created_at: datetime
     updated_at: datetime
 
+class NotificationIn(Schema):
+    title: str
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    link_url: Optional[str] = None
+    notification_type: Optional[str] = None
 
 class PaginatedNotificationOut(Schema):
     items: List[NotificationOut]
