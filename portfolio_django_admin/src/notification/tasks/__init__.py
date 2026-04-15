@@ -1,5 +1,5 @@
-from .process_notification import process_notification
+from .process_notification import publish_notification
 
 __all__ = [
-    'process_notification',
+    'publish_notification',
 ]

@@ -1,5 +1,6 @@
 from notification.models import UserNotification
 from notification.dto import PublishUserNotificationDTO
+from django.contrib.auth import get_user_model
 from asgiref.sync import sync_to_async
 from typing import List, Tuple
 
@@ -18,6 +19,13 @@ def create_notification(dto: PublishUserNotificationDTO) -> UserNotification:
 def create_notification_async(dto: PublishUserNotificationDTO) -> UserNotification:
     return create_notification(dto)
 
+
+@sync_to_async
+def get_user_id_by_username(username: str) -> int:
+    try:
+        return get_user_model().objects.values_list('id', flat=True).get(username=username)
+    except get_user_model().DoesNotExist:
+        return None
 
 @sync_to_async
 def get_user_notifications(user_id: int, page: int = 1, page_size: int = 10) -> Tuple[List[UserNotification], int]:

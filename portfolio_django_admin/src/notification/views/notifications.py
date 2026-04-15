@@ -6,11 +6,11 @@ from notification.schemas import (
     NotificationReadStatusUpdateOut
 )
 from notification.services import (
+    get_user_id_by_username,
     get_user_notifications,
     get_user_unread_notifications,
     mark_notifications_as_read
 )
-from organization.services import get_user_id_by_username
 from authentication.services import AuthBearer
 
 router = Router(tags=["Notification"], auth=AuthBearer())

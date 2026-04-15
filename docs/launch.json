@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        {
+            "name": "Django Admin API",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/portfolio_django_admin/src/manage.py",
+            "args": [
+                "runserver",
+                // "--noreload"
+            ],
+            "django": true,
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "portfolio_django_admin.settings"
+            },
+            "envFile": "${workspaceFolder}/portfolio_django_admin/src/.env"
+        },
+        {
+            "name": "Celery Processor",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "celery",
+            "console": "integratedTerminal",
+            "args": [
+                "-A",
+                "portfolio_django_admin.celery",
+                "worker",
+                "--loglevel=INFO"
+            ],
+            "cwd": "${workspaceFolder}/portfolio_django_admin/src",
+            "envFile": "${workspaceFolder}/portfolio_django_admin/src/.env",
+            "python": "${workspaceFolder}/portfolio_django_admin/.venv/bin/python"
+        }
+    ]
+}

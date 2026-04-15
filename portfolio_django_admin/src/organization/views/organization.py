@@ -5,9 +5,9 @@ from organization.schemas import (
     OrganizationIn,
     OrganizationUpdateIn,
     OrganizationOut,
-    OrganizationUserIn,
     OrganizationUserUpdateIn,
     OrganizationUserOut,
+    OrganizationLeaveOut,
     ErrorMessage,
 )
 from organization.services import (
@@ -18,10 +18,10 @@ from organization.services import (
     update_organization,
     delete_organization,
     list_organization_users,
-    invite_organization_user,
     update_organization_user_role,
     remove_organization_user,
     select_organization,
+    leave_organization
 )
 from authentication.constants import (
     OrganizationRoleType,
@@ -97,7 +97,7 @@ async def get_org(request, org_id: UUID):
 )
 @require_org_roles(ORG_ADMIN_ROLES)
 async def update_org(request, org_id: UUID, payload: OrganizationUpdateIn):
-    org, error = await update_organization(org_id, payload.description)
+    org, error = await update_organization(org_id, payload.description, updated_by_username=request.auth["sub"])
     if error == "not_found":
         return 404, {"message": "Organization not found"}
 
@@ -125,39 +125,18 @@ async def delete_org(request, org_id: UUID):
 @require_org_roles(list(OrganizationRoleType))
 async def list_org_users(request, org_id: UUID):
     users = await list_organization_users(org_id)
-    return 200, users
-
-
-@router.post(
-    "/{org_id}/users",
-    response={
-        201: OrganizationUserOut,
-        400: ErrorMessage,
-        403: ErrorMessage,
-        404: ErrorMessage,
-        409: ErrorMessage,
-    },
-)
-@require_org_roles(ORG_MANAGEMENT_ROLES)
-async def add_org_user(request, org_id: UUID, payload: OrganizationUserIn):
-    requester_role = request.org_role
-    allowed_roles = (
-        OWNER_ASSIGNABLE_ROLES if requester_role in ORG_ADMIN_ROLES else MANAGER_ASSIGNABLE_ROLES
-    )
-    if payload.role not in allowed_roles:
-        return 400, {
-            "message": f"You cannot assign role '{payload.role}'. Allowed roles: {allowed_roles}"
-        }
-
-    org_user, error = await invite_organization_user(org_id, payload.email, payload.role)
-    if error == "user_not_found":
-        return 404, {"message": f"User '{payload.email}' not found"}
-    if error == "org_not_found":
-        return 404, {"message": "Organization not found"}
-    if error == "user_already_member":
-        return 409, {"message": f"User '{payload.email}' is already a member of this organization"}
-
-    return 201, org_user
+    return 200, [
+        OrganizationUserOut(
+            id=user.id,
+            organization_id=org_id,
+            email=user.user.email,
+            role=user.role,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+            invitation_status=user.invitation_status,
+        )
+        for user in users
+    ]
 
 
 @router.patch(
@@ -184,7 +163,15 @@ async def update_org_user_role(request, org_id: UUID, user_email: str, payload: 
     if error == "user_not_found":
         return 404, {"message": f"User '{user_email}' not found in this organization"}
 
-    return 200, org_user
+    return 200, OrganizationUserOut(
+        id=org_user.id,
+        organization_id=org_id,
+        email=org_user.user.email,
+        role=org_user.role,
+        created_at=org_user.created_at,
+        updated_at=org_user.updated_at,
+        invitation_status=org_user.invitation_status,
+    )
 
 
 @router.delete(
@@ -200,3 +187,24 @@ async def remove_org_user(request, org_id: UUID, user_email: str):
         return 403, {"message": "Cannot remove an owner or admin from the organization"}
 
     return 204, None
+
+@router.post(
+    "/{org_id}/leave",
+    response={
+        201: OrganizationLeaveOut,
+        400: ErrorMessage,
+        403: ErrorMessage,
+        404: ErrorMessage,
+    },
+)
+@require_org_roles(list(OrganizationRoleType))
+async def leave_org(request, org_id: UUID):
+    user_id = await get_user_id_by_username(request.auth["sub"])
+    if not user_id:
+        return 400, {"message": "User not found"}
+
+    success, error = await leave_organization(org_id=org_id, user_id=user_id)
+    if error == "user_not_found":
+        return 404, {"message": "User is not a member of this organization"}
+
+    return 201, {"message": "You have left the organization successfully"}

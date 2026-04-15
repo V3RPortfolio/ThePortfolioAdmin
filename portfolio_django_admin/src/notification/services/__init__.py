@@ -1,4 +1,5 @@
 from .notification_service import (
+    get_user_id_by_username,
     create_notification,
     create_notification_async,
     get_user_notifications,
@@ -7,6 +8,7 @@ from .notification_service import (
 )
 
 __all__ = [
+    "get_user_id_by_username",
     "create_notification",
     "create_notification_async",
     "get_user_notifications",

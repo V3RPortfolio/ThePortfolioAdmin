@@ -51,9 +51,12 @@ class OrganizationUserOut(Schema):
     updated_at: datetime
     invitation_status: str
 
-    @staticmethod
-    def resolve_email(obj):
-        return obj.user.email
+
+class OrganizationLeaveOut(Schema):
+    message: str
+
+class OrganizationInvitationResponseIn(Schema):
+    accept: bool
 
 
 class ErrorMessage(Schema):
