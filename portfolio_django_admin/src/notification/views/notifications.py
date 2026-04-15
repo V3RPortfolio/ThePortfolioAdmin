@@ -2,7 +2,8 @@ from ninja import Router
 from notification.schemas import (
     PaginatedNotificationOut,
     ErrorMessage,
-    NotificationReadStatusUpdate
+    NotificationReadStatusUpdatIn,
+    NotificationReadStatusUpdateOut
 )
 from notification.services import (
     get_user_notifications,
@@ -58,13 +59,13 @@ async def list_unread_notifications(request, page: int = 1, page_size: int = 10)
 
 @router.post(
     "/mark-read",
-    response={200: NotificationReadStatusUpdate, 400: ErrorMessage},
+    response={200: NotificationReadStatusUpdateOut, 400: ErrorMessage},
 )
-async def mark_notifications_as_read(request, notification_ids: list[int]):
+async def mark_as_read(request, payload: NotificationReadStatusUpdatIn):
     user_id = await get_user_id_by_username(request.auth["sub"])
     if not user_id:
         return 400, {"message": "User not found"}
 
-    total = await mark_notifications_as_read(user_id, notification_ids)
+    total = await mark_notifications_as_read(user_id, payload.notification_ids)
 
-    return 200, NotificationReadStatusUpdate(is_read=True, total_updated=total)
+    return 200, NotificationReadStatusUpdateOut(is_read=True, total_updated=total)

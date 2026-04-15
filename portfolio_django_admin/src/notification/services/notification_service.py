@@ -37,7 +37,7 @@ def get_user_unread_notifications(user_id: int, page: int = 1, page_size: int = 
     return items, total
 
 @sync_to_async
-def mark_notifications_as_read(user_id: int, notification_ids: List[int]) -> int:
+def mark_notifications_as_read(user_id: int, notification_ids: List[str]) -> int:
     notifications =UserNotification.objects.filter(user_id=user_id, id__in=notification_ids).update(is_read=True) 
     if notifications == 0:
         raise ValueError("No notifications were marked as read. Please check the notification IDs and try again.")

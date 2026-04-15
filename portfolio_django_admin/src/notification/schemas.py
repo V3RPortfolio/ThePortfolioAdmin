@@ -32,6 +32,9 @@ class PaginatedNotificationOut(Schema):
 class ErrorMessage(Schema):
     message: str
 
-class NotificationReadStatusUpdate(Schema):
+class NotificationReadStatusUpdateOut(Schema):
     is_read: bool
     total_updated: int
+
+class NotificationReadStatusUpdatIn(Schema):
+    notification_ids: List[str]
