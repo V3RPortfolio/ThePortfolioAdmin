@@ -5,7 +5,7 @@ from notification.schemas import (
     ErrorMessage,
 )
 from authentication.services import AuthBearer
-from notification.services import create_notification_async
+from notification.services import create_notification
 from notification.models import UserNotification, NotificationType
 from django.contrib.auth import get_user_model
 
@@ -22,7 +22,7 @@ async def create_notifications(request, notification:NotificationIn):
     except get_user_model().DoesNotExist:
         return 400, {"message": "User not found"}
 
-    user_notification = await create_notification_async(
+    user_notification = await create_notification(
         UserNotification(
             user_id=user.id,
             title=notification.title,

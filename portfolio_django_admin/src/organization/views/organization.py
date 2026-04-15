@@ -47,10 +47,17 @@ async def create_org(request, payload: OrganizationIn):
         return 400, {"message": "User not found"}
 
     org, error = await create_organization(payload.name, user_id)
-    if error == "name_taken":
-        return 409, {"message": f"Organization with name '{payload.name}' already exists"}
+    if error:
+        return 409, {"message": error}
 
-    return 201, org
+    return 201, OrganizationOut(
+        id=org.id,
+        name=org.name,
+        description=org.description,
+        created_at=org.created_at,
+        updated_at=org.updated_at,
+        status=org.status,
+    )
 
 
 @router.get("/", response={200: List[OrganizationOut]})
@@ -60,7 +67,17 @@ async def list_orgs(request):
         return 200, []
 
     orgs = await get_user_organizations(user_id)
-    return 200, orgs
+    return 200, [
+        OrganizationOut(
+            id=org.id,
+            name=org.name,
+            description=org.description,
+            created_at=org.created_at,
+            updated_at=org.updated_at,
+            status=org.status,
+        )
+        async for org in orgs
+    ]
 
 
 @router.post("/{org_id}/select", response={200: dict, 400: ErrorMessage, 404: ErrorMessage})
@@ -70,8 +87,8 @@ async def select_org(request, org_id: UUID):
         return 400, {"message": "User not found"}
 
     role, error = await select_organization(user_id, org_id)
-    if error == "user_not_in_organization":
-        return 404, {"message": "User is not a member of this organization"}
+    if error:
+        return 404, {"message": error}
 
     return 200, {"message": "Organization selected successfully", "role": role}
 
@@ -83,7 +100,14 @@ async def get_org(request, org_id: UUID):
     if not org:
         return 404, {"message": "Organization not found"}
 
-    return 200, org
+    return 200, OrganizationOut(
+        id=org.id,
+        name=org.name,
+        description=org.description,
+        created_at=org.created_at,
+        updated_at=org.updated_at,
+        status=org.status,
+    )
 
 
 @router.patch(
@@ -98,10 +122,17 @@ async def get_org(request, org_id: UUID):
 @require_org_roles(ORG_ADMIN_ROLES)
 async def update_org(request, org_id: UUID, payload: OrganizationUpdateIn):
     org, error = await update_organization(org_id, payload.description, updated_by_username=request.auth["sub"])
-    if error == "not_found":
-        return 404, {"message": "Organization not found"}
+    if error:
+        return 404, {"message": error}
 
-    return 200, org
+    return 200, OrganizationOut(
+        id=org.id,
+        name=org.name,
+        description=org.description,
+        created_at=org.created_at,
+        updated_at=org.updated_at,
+        status=org.status,
+    )
 
 
 @router.delete("/{org_id}", response={204: None, 403: ErrorMessage, 404: ErrorMessage})
@@ -135,7 +166,7 @@ async def list_org_users(request, org_id: UUID):
             updated_at=user.updated_at,
             invitation_status=user.invitation_status,
         )
-        for user in users
+        async for user in users
     ]
 
 
@@ -160,8 +191,8 @@ async def update_org_user_role(request, org_id: UUID, user_email: str, payload: 
         }
 
     org_user, error = await update_organization_user_role(org_id, user_email, payload.role)
-    if error == "user_not_found":
-        return 404, {"message": f"User '{user_email}' not found in this organization"}
+    if error:
+        return 404, {"message": error}
 
     return 200, OrganizationUserOut(
         id=org_user.id,
@@ -176,15 +207,13 @@ async def update_org_user_role(request, org_id: UUID, user_email: str, payload: 
 
 @router.delete(
     "/{org_id}/users/{user_email}",
-    response={204: None, 403: ErrorMessage, 404: ErrorMessage},
+    response={204: None, 403: ErrorMessage},
 )
 @require_org_roles(ORG_MANAGEMENT_ROLES)
 async def remove_org_user(request, org_id: UUID, user_email: str):
     success, error = await remove_organization_user(org_id, user_email)
-    if error == "user_not_found":
-        return 404, {"message": f"User '{user_email}' not found in this organization"}
-    if error == "cannot_remove_admin_or_owner":
-        return 403, {"message": "Cannot remove an owner or admin from the organization"}
+    if error:
+        return 403, {"message": error}
 
     return 204, None
 
@@ -194,7 +223,6 @@ async def remove_org_user(request, org_id: UUID, user_email: str):
         201: OrganizationLeaveOut,
         400: ErrorMessage,
         403: ErrorMessage,
-        404: ErrorMessage,
     },
 )
 @require_org_roles(list(OrganizationRoleType))
@@ -204,7 +232,7 @@ async def leave_org(request, org_id: UUID):
         return 400, {"message": "User not found"}
 
     success, error = await leave_organization(org_id=org_id, user_id=user_id)
-    if error == "user_not_found":
-        return 404, {"message": "User is not a member of this organization"}
+    if error:
+        return 403, {"message": error}
 
     return 201, {"message": "You have left the organization successfully"}

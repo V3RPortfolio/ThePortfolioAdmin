@@ -40,6 +40,7 @@ class Organization(models.Model):
 
 
 class OrganizationUser(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,

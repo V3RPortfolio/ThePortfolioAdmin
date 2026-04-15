@@ -22,11 +22,6 @@ class NotificationIn(Schema):
     link_url: Optional[str] = None
     notification_type: Optional[str] = None
 
-class PaginatedNotificationOut(Schema):
-    items: List[NotificationOut]
-    total: int
-    page: int
-    page_size: int
 
 
 class ErrorMessage(Schema):

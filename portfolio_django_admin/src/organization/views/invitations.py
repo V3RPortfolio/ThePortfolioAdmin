@@ -3,8 +3,8 @@ from typing import List
 from uuid import UUID
 from organization.schemas import (
     OrganizationUserIn,
-    OrganizationUserOut,
     OrganizationInvitationResponseIn,
+    OrganizationInvitationOut,
     ErrorMessage,
 )
 from organization.services import (
@@ -28,7 +28,7 @@ router = Router(tags=["Organization"], auth=AuthBearer())
 @router.post(
     "/{org_id}/respond",
     response={
-        201: OrganizationUserOut,
+        201: OrganizationInvitationOut,
         400: ErrorMessage,
         403: ErrorMessage,
         404: ErrorMessage,
@@ -51,19 +51,20 @@ async def respond_to_org_invite(request, org_id: UUID, payload: OrganizationInvi
     if response is None:
         return 404, {"message": message or "Organization not found"}
     
-    return 201, OrganizationUserOut(
+    return 201, OrganizationInvitationOut(
         id=response.id,
         organization_id=org_id,
-        email=response.user.email,
+        organization_name=response.organization.name,
+        invited_email=response.user.email,
+        invited_by=response.invited_by,
         role=response.role,
         created_at=response.created_at,
-        updated_at=response.updated_at,
         invitation_status=response.invitation_status,
     )
 
 @router.get(
-    "/",
-    response={200: List[OrganizationUserOut], 403: ErrorMessage},
+    "/pending",
+    response={200: List[OrganizationInvitationOut], 403: ErrorMessage},
 )
 async def list_org_invitations(request):
     user_id = await get_user_id_by_username(request.auth["sub"])
@@ -72,22 +73,23 @@ async def list_org_invitations(request):
     
     invitations = await list_pending_invitations(user_id)
     return 200, [
-        OrganizationUserOut(
+        OrganizationInvitationOut(
             id=invite.id,
             organization_id=invite.organization.id,
-            email=invite.user.email,
+            organization_name=invite.organization.name,
+            invited_by=invite.invited_by,
+            invited_email=invite.user.email,
             role=invite.role,
             created_at=invite.created_at,
-            updated_at=invite.updated_at,
             invitation_status=invite.invitation_status,
         )
-        for invite in invitations
+        async for invite in invitations
     ]
 
 @router.post(
     "/{org_id}/invite",
     response={
-        201: OrganizationUserOut,
+        201: OrganizationInvitationOut,
         400: ErrorMessage,
         403: ErrorMessage,
         404: ErrorMessage,
@@ -106,21 +108,22 @@ async def add_org_user(request, org_id: UUID, payload: OrganizationUserIn):
         }
 
     org_user, error = await invite_organization_user(
-        org_id=org_id, email=payload.email, role=payload.role)
-    if error == "user_not_found":
-        return 404, {"message": f"User '{payload.email}' not found"}
-    if error == "org_not_found":
-        return 404, {"message": "Organization not found"}
-    if error == "user_already_member":
-        return 409, {"message": f"User '{payload.email}' is already a member of this organization"}
+        org_id=org_id, 
+        email=payload.email, 
+        role=payload.role,
+        invited_by=request.auth["sub"]
+    )
+    if error:
+        return 404, {"message": error}
 
-    return 201, OrganizationUserOut(
+    return 201, OrganizationInvitationOut(
         id=org_user.id,
         organization_id=org_id,
-        email=org_user.user.email,
+        organization_name=org_user.organization.name,
+        invited_by=org_user.invited_by,
+        invited_email=org_user.user.email,
         role=org_user.role,
         created_at=org_user.created_at,
-        updated_at=org_user.updated_at,
         invitation_status=org_user.invitation_status,
     )
 

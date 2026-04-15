@@ -9,14 +9,17 @@ from .organization import (
     delete_organization,
     get_organization_user_role,
     list_organization_users,
-    invite_organization_user,
     update_organization_user_role,
     remove_organization_user,
     select_organization,
-    leave_organization,
-    respond_to_organization_invite,
+    leave_organization
+)
+
+from .invitations import (
+    invite_organization_user,
     get_invitation,
-    list_pending_invitations
+    list_pending_invitations,
+    respond_to_organization_invite
 )
 
 __all__ = [

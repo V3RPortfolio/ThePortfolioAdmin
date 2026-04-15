@@ -43,12 +43,22 @@ class OrganizationUserUpdateIn(Schema):
 
 
 class OrganizationUserOut(Schema):
-    id: int
+    id: UUID
     organization_id: UUID
     email: str
     role: str
     created_at: datetime
     updated_at: datetime
+    invitation_status: str
+
+class OrganizationInvitationOut(Schema):
+    id: UUID
+    organization_id: UUID
+    organization_name: str
+    invited_by: str
+    invited_email: str
+    role: str
+    created_at: datetime
     invitation_status: str
 
 
