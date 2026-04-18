@@ -1,10 +1,9 @@
 from django.db.models import QuerySet
 from organization.models import Device, DeviceConfiguration
-from organization.constants import DeviceDataType
 
 from typing import Optional, Tuple
 from uuid import UUID
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 
 
 async def add_device(

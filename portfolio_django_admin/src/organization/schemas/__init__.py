@@ -22,7 +22,7 @@ from .devices import (
 )
 
 
-_all__ = [
+__all__ = [
     "OrganizationIn",
     "OrganizationUpdateIn",
     "OrganizationOut",
