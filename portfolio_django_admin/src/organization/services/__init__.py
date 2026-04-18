@@ -22,6 +22,17 @@ from .invitations import (
     respond_to_organization_invite
 )
 
+from .devices import (
+    add_device,
+    list_devices,
+    get_device_details,
+    deactivate_device,
+    remove_device,
+    add_device_configuration,
+    remove_device_configuration,
+    get_device_connection_status,
+)
+
 __all__ = [
     "get_user_id_by_email",
     "get_user_id_by_username",
@@ -40,5 +51,13 @@ __all__ = [
     "leave_organization",
     "respond_to_organization_invite",
     "get_invitation",
-    "list_pending_invitations"
+    "list_pending_invitations",
+    "add_device",
+    "list_devices",
+    "get_device_details",
+    "deactivate_device",
+    "remove_device",
+    "add_device_configuration",
+    "remove_device_configuration",
+    "get_device_connection_status",
 ]

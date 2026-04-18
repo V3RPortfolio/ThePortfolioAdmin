@@ -12,8 +12,17 @@ from .organization import (
     ErrorMessage
 )
 
+from .devices import (
+    DeviceIn,
+    DeviceOut,
+    DeviceDetailOut,
+    DeviceConfigurationIn,
+    DeviceConfigurationOut,
+    DeviceConnectionStatusOut,
+)
 
-_all__ = [
+
+__all__ = [
     "OrganizationIn",
     "OrganizationUpdateIn",
     "OrganizationOut",
@@ -24,5 +33,11 @@ _all__ = [
     "OrganizationInvitationOut",
     "OrganizationLeaveOut",
     "OrganizationInvitationResponseIn",
-    "ErrorMessage"
+    "ErrorMessage",
+    "DeviceIn",
+    "DeviceOut",
+    "DeviceDetailOut",
+    "DeviceConfigurationIn",
+    "DeviceConfigurationOut",
+    "DeviceConnectionStatusOut",
 ]
