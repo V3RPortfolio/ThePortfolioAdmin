@@ -12,6 +12,12 @@ class DeviceIn(Schema):
     device_type: DeviceType = DeviceType.DESKTOP
 
 
+class DeviceConfigurationOut(Schema):
+    id: UUID
+    device_id: UUID
+    data_type: str
+    created_at: datetime
+    updated_at: datetime
 class DeviceOut(Schema):
     id: UUID
     organization_id: UUID
@@ -23,6 +29,8 @@ class DeviceOut(Schema):
     updated_at: datetime
     last_heartbeat_at: Optional[datetime] = None
 
+    configurations: List[DeviceConfigurationOut] = []
+
 
 class DeviceDetailOut(DeviceOut):
     configurations: List["DeviceConfigurationOut"] = []
@@ -30,14 +38,6 @@ class DeviceDetailOut(DeviceOut):
 
 class DeviceConfigurationIn(Schema):
     data_type: DeviceDataType
-
-
-class DeviceConfigurationOut(Schema):
-    id: UUID
-    device_id: UUID
-    data_type: str
-    created_at: datetime
-    updated_at: datetime
 
 
 class DeviceConnectionStatusOut(Schema):

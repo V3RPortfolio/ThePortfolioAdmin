@@ -121,7 +121,7 @@ async def get_device_details_endpoint(request, org_id: UUID, device_id: UUID):
             created_at=config.created_at,
             updated_at=config.updated_at,
         )
-        for config in device.configurations.all()
+        for config in device.configurations.all() if hasattr(device, 'configurations')
     ]
 
     return 200, DeviceDetailOut(
@@ -193,7 +193,7 @@ async def add_device_configuration_endpoint(request, org_id: UUID, device_id: UU
         device_id=device_id,
         data_type=config.data_type,
         created_at=config.created_at,
-        updated_at=config.updated_at,
+        updated_at=config.updated_at
     )
 
 

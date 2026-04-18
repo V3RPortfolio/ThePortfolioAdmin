@@ -23,6 +23,7 @@ class Device(models.Model):
 
     last_heartbeat_at = models.DateTimeField(null=True, blank=True)
 
+    configurations:list['DeviceConfiguration'] = []  # This will be populated manually in the service layer
     class Meta:
         unique_together = ('organization', 'name')
         db_table = 'devices'
