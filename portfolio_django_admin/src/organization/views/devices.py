@@ -20,6 +20,7 @@ from typing import List
 from uuid import UUID
 from organization.schemas import (
     DeviceIn,
+    DeviceUpdate,
     DeviceOut,
     DeviceDetailOut,
     DeviceConfigurationIn,
@@ -29,6 +30,7 @@ from organization.schemas import (
 )
 from organization.services import (
     add_device,
+    update_device,
     list_devices,
     get_device_details,
     deactivate_device,
@@ -79,6 +81,32 @@ async def add_device_endpoint(request, org_id: UUID, payload: DeviceIn):
         last_heartbeat_at=device.last_heartbeat_at,
     )
 
+@router.put(
+    "/{org_id}/{device_id}/",
+    response={200: DeviceOut, 400: ErrorMessage, 403: ErrorMessage, 404: ErrorMessage, 409: ErrorMessage},
+)
+@require_org_roles(ORG_ADMIN_ROLES)
+async def update_device_endpoint(request, org_id: UUID, device_id: UUID, payload: DeviceUpdate):
+    device, error = await update_device(
+        org_id=org_id,
+        device_id=device_id,
+        name=payload.name,
+        description=payload.description,
+    )
+
+    if error:
+        return 404, {"message": error}
+    return 200, DeviceOut(
+        id=device.id,
+        organization_id=org_id,
+        name=device.name,
+        description=device.description,
+        device_type=device.device_type,
+        is_active=device.is_active,
+        created_at=device.created_at,
+        updated_at=device.updated_at,
+        last_heartbeat_at=device.last_heartbeat_at,
+    )
 
 @router.get(
     "/{org_id}/",

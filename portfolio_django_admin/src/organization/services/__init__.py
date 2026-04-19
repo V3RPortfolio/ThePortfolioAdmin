@@ -24,6 +24,7 @@ from .invitations import (
 
 from .devices import (
     add_device,
+    update_device,
     list_devices,
     get_device_details,
     deactivate_device,
@@ -53,6 +54,7 @@ __all__ = [
     "get_invitation",
     "list_pending_invitations",
     "add_device",
+    "update_device",
     "list_devices",
     "get_device_details",
     "deactivate_device",

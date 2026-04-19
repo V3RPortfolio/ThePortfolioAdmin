@@ -14,6 +14,7 @@ from .organization import (
 
 from .devices import (
     DeviceIn,
+    DeviceUpdate,
     DeviceOut,
     DeviceDetailOut,
     DeviceConfigurationIn,
@@ -35,6 +36,7 @@ __all__ = [
     "OrganizationInvitationResponseIn",
     "ErrorMessage",
     "DeviceIn",
+    "DeviceUpdate",
     "DeviceOut",
     "DeviceDetailOut",
     "DeviceConfigurationIn",

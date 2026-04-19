@@ -22,6 +22,26 @@ async def add_device(
     return device, None
 
 
+async def update_device(
+    org_id: UUID, device_id: UUID, name: Optional[str] = None, description: Optional[str] = None,
+):
+    try:
+        device = await Device.objects.aget(id=device_id, organization_id=org_id)
+    except Device.DoesNotExist:
+        return None, "Device not found in this organization."
+
+    if name and name != device.name:
+        if await Device.objects.filter(organization_id=org_id, name=name).aexists():
+            return None, "A device with this name already exists in the organization."
+        device.name = name
+
+    if description is not None:
+        device.description = description
+
+    device.updated_at = datetime.now(timezone.utc)
+    await device.asave()
+    return device, None
+
 async def list_devices(org_id: UUID) -> QuerySet[Device]:
     return Device.objects.filter(organization_id=org_id).order_by('name')
 

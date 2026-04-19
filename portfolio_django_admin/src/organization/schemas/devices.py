@@ -11,6 +11,10 @@ class DeviceIn(Schema):
     description: Optional[str] = None
     device_type: DeviceType = DeviceType.DESKTOP
 
+class DeviceUpdate(Schema):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
 
 class DeviceConfigurationOut(Schema):
     id: UUID
