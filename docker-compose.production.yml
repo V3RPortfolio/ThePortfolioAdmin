@@ -28,7 +28,7 @@ services:
       - platform_net
     volumes:
       - ./portfolio_django_admin/src:/usr/local/app/src
-    command: uv run celery -A portfolio_django_admin.celery worker --loglevel=info
+    command: uv run celery -A portfolio_django_admin.celery worker --concurrency=1 --loglevel=info
 
 networks:
   platform_net:
