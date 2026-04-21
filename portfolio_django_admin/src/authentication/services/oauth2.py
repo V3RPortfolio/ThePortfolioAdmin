@@ -83,4 +83,7 @@ class Oauth2Service:
             redirect_uri=self._redirect_uri
         )
         user_info = provider.get(self._userinfo_url).json()
+        if isinstance(user_info, dict):
+            user_info["given_name"] = user_info.get("given_name") or ""
+            user_info["family_name"] = user_info.get("family_name") or ""
         return GoogleOauth2Info.model_validate(user_info)
