@@ -31,6 +31,6 @@ class GoogleOauth2Info(Schema):
     name: Optional[str] = None
     picture: Optional[str] = None
     sub: Optional[str] = None
-    given_name: Optional[str] = ""
-    family_name: Optional[str] = ""
+    given_name: Optional[str] = None
+    family_name: Optional[str] = None
     email_verified: Optional[bool] = None
