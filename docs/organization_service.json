@@ -1,0 +1,464 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OrganizationManagementService",
+    "description": "Organization Management Service",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/organization/v1": {
+      "put": {
+        "tags": [
+          "organizaion"
+        ],
+        "summary": "Update Organization",
+        "description": "Endpoint to update an existing organization.",
+        "operationId": "update_organization_organization_v1_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageOrganizationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "organizaion"
+        ],
+        "summary": "Create Organization",
+        "description": "Endpoint to create a new organization.",
+        "operationId": "create_organization_organization_v1_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageOrganizationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organization/{organization_id}/v1": {
+      "get": {
+        "tags": [
+          "organizaion"
+        ],
+        "summary": "Get Organization",
+        "description": "Endpoint to retrieve organization information.",
+        "operationId": "get_organization_organization__organization_id__v1_get",
+        "parameters": [
+          {
+            "name": "organization_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Organization Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "organizaion"
+        ],
+        "summary": "Delete Organization",
+        "description": "Endpoint to delete an organization.",
+        "operationId": "delete_organization_organization__organization_id__v1_delete",
+        "parameters": [
+          {
+            "name": "organization_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Organization Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organization/{organization_id}/provision/v1": {
+      "post": {
+        "tags": [
+          "organizaion"
+        ],
+        "summary": "Provision Organization Index",
+        "description": "Endpoint to provision index for an organization.",
+        "operationId": "provision_organization_index_organization__organization_id__provision_v1_post",
+        "parameters": [
+          {
+            "name": "organization_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Organization Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Provision Organization Index Organization  Organization Id  Provision V1 Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organization/{organization_id}/deprovision/v1": {
+      "post": {
+        "tags": [
+          "organizaion"
+        ],
+        "summary": "Deprovision Organization Index",
+        "description": "Endpoint to deprovision index for an organization.",
+        "operationId": "deprovision_organization_index_organization__organization_id__deprovision_v1_post",
+        "parameters": [
+          {
+            "name": "organization_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Organization Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Deprovision Organization Index Organization  Organization Id  Deprovision V1 Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ManageOrganizationDTO": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "title": "Organization Id",
+            "description": "ID of the organization"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Name of the organization"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active",
+            "description": "Whether the organization is active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization_id"
+        ],
+        "title": "ManageOrganizationDTO",
+        "description": "Data Transfer Object for managing organization information."
+      },
+      "OrganizationIndexDTO": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the index"
+          },
+          "major_version": {
+            "type": "integer",
+            "title": "Major Version",
+            "description": "Major version number of the index schema. It should be incremented when there are breaking changes in the schema which requires reindexing of data."
+          },
+          "minor_version": {
+            "type": "integer",
+            "title": "Minor Version",
+            "description": "Minor version number of the index schema. It should be incremented when there are non-breaking changes in the schema which does not require reindexing of data."
+          },
+          "patch_version": {
+            "type": "integer",
+            "title": "Patch Version",
+            "description": "Patch version number of the index schema. It should be incremented when there are minor changes in the schema such as adding new properties which does not require reindexing of data."
+          },
+          "last_attempted_provisioned_at": {
+            "type": "string",
+            "title": "Last Attempted Provisioned At",
+            "description": "Timestamp when the index was last provisioned"
+          },
+          "provisioning_index_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provisioning Index Name",
+            "description": "Name of the index being provisioned. It will be null if the provisioning is completed or failed."
+          },
+          "provision_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provision Status",
+            "description": "Provision status of the index. It can be one of 'pending', 'in_progress', 'completed', 'failed'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "major_version",
+          "minor_version",
+          "patch_version",
+          "last_attempted_provisioned_at",
+          "provision_status"
+        ],
+        "title": "OrganizationIndexDTO"
+      },
+      "OrganizationResponseDTO": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "title": "Organization Id",
+            "description": "ID of the organization"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Name of the organization"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "description": "Whether the organization is active"
+          },
+          "indices": {
+            "items": {
+              "$ref": "#/components/schemas/OrganizationIndexDTO"
+            },
+            "type": "array",
+            "title": "Indices",
+            "description": "List of indices associated with the organization"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization_id",
+          "name",
+          "is_active"
+        ],
+        "title": "OrganizationResponseDTO",
+        "description": "Data Transfer Object for organization response."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
