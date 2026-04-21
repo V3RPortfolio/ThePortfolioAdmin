@@ -22,6 +22,11 @@ from .devices import (
     DeviceConnectionStatusOut,
 )
 
+from .resources import (
+    ManageResourceDto,
+    ResourceIndexDto,
+    ResourceDto,
+)
 
 __all__ = [
     "OrganizationIn",
@@ -42,4 +47,7 @@ __all__ = [
     "DeviceConfigurationIn",
     "DeviceConfigurationOut",
     "DeviceConnectionStatusOut",
+    "ManageResourceDto",
+    "ResourceIndexDto",
+    "ResourceDto",
 ]
