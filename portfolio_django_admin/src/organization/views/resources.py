@@ -5,7 +5,7 @@ from organization.schemas import ErrorMessage
 from organization.services.resources import ResourceService
 from authentication.constants import ORG_ADMIN_ROLES
 from authentication.services import AuthBearer
-from organization.decorators import require_org_roles
+from organization.decorators import require_org_roles, belongs_to_organization
 
 router = Router(tags=["Organization Resources"], auth=AuthBearer())
 
@@ -63,7 +63,7 @@ async def provision_resource(request, org_id: UUID):
     "/{org_id}/resources",
     response={200: ResourceDto, 403: ErrorMessage, 404: ErrorMessage},
 )
-@require_org_roles(ORG_ADMIN_ROLES)
+@belongs_to_organization
 async def get_resource_status(request, org_id: UUID):
     """Gets the organization resource."""
     token = _get_jwt_token(request)

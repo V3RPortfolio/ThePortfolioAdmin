@@ -116,3 +116,60 @@ def require_org_roles(allowed_roles: Union[OrganizationRoleType, List[Organizati
 
         return wrapper
     return decorator
+
+
+def belongs_to_organization(func):
+    """
+    Decorator to check if the requesting user belongs to the target organization.
+    The decorated view must accept an ``org_id: UUID`` path parameter.
+    Returns a 403 response if the user is not a member of the organization.
+    """
+    if is_function_async(func):
+        @wraps(func)
+        async def wrapper(request, org_id: UUID, *args, **kwargs):
+            from organization.services.organization import (
+                get_user_id_by_username,
+                is_in_organization,
+            )
+
+            username = request.auth.get("sub") if request.auth else None
+            if not username:
+                return JsonResponse({"detail": "Authentication required"}, status=401)
+
+            user_id = await get_user_id_by_username(username)
+            if user_id is None:
+                return JsonResponse({"detail": "User not found"}, status=403)
+
+            if not await is_in_organization(org_id, user_id):
+                return JsonResponse(
+                    {"detail": "You are not a member of this organization"},
+                    status=403,
+                )
+
+            return await func(request, org_id, *args, **kwargs)
+    else:
+        @wraps(func)
+        def wrapper(request, org_id: UUID, *args, **kwargs):
+            from organization.services.organization import (
+                get_user_id_by_username,
+                is_in_organization,
+            )
+            from asgiref.sync import async_to_sync
+
+            username = request.auth.get("sub") if request.auth else None
+            if not username:
+                return JsonResponse({"detail": "Authentication required"}, status=401)
+
+            user_id = async_to_sync(get_user_id_by_username)(username)
+            if user_id is None:
+                return JsonResponse({"detail": "User not found"}, status=403)
+
+            if not async_to_sync(is_in_organization)(org_id, user_id):
+                return JsonResponse(
+                    {"detail": "You are not a member of this organization"},
+                    status=403,
+                )
+
+            return func(request, org_id, *args, **kwargs)
+
+    return wrapper

@@ -139,6 +139,14 @@ async def get_organization_user_role(org_id: UUID, user_id: int) -> Optional[str
         return None
 
 
+async def is_in_organization(org_id: UUID, user_id: int) -> bool:
+    return await OrganizationUser.objects.filter(
+        organization_id=org_id,
+        user_id=user_id,
+        invitation_status=UserInvitationStatus.ACCEPTED.value,
+    ).exclude(organization__status=OrganizationStatus.DELETED.value).aexists()
+
+
 
 async def list_organization_users(org_id: UUID) -> QuerySet[OrganizationUser]:
     return OrganizationUser.objects.filter(organization_id=org_id).exclude(
