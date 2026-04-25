@@ -137,7 +137,7 @@ async def add_device_configuration(
 
     try:
         elastic_indices = [
-            dc async for dc in DeviceConfiguration.objects.filter(device=device).values_list('data_type', flat=True)
+            data_type async for data_type in DeviceConfiguration.objects.filter(device=device).values_list('data_type', flat=True)
         ]
         api_key = create_device_access_token(
             device_id=str(device.id),
