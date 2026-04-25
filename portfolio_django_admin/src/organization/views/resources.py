@@ -2,7 +2,7 @@ from ninja import Router
 from uuid import UUID
 from organization.schemas.resources import ManageResourceDto, ResourceDto
 from organization.schemas import ErrorMessage
-from organization.services.resources import ResourceService
+from organization.services import ResourceService
 from authentication.constants import ORG_ADMIN_ROLES
 from authentication.services import AuthBearer
 from organization.decorators import require_org_roles

@@ -32,8 +32,11 @@ from .devices import (
     add_device_configuration,
     remove_device_configuration,
     get_device_connection_status,
+    generate_device_access_token,
     download_device_installation_script,
 )
+
+from .resources import ResourceService
 
 __all__ = [
     "get_user_id_by_email",
@@ -63,5 +66,8 @@ __all__ = [
     "add_device_configuration",
     "remove_device_configuration",
     "get_device_connection_status",
+    "generate_device_access_token",
     "download_device_installation_script",
+
+    "ResourceService",
 ]

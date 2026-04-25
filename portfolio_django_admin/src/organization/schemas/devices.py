@@ -37,7 +37,6 @@ class DeviceOut(Schema):
     created_at: datetime
     updated_at: datetime
     last_heartbeat_at: Optional[datetime] = None
-    api_key: Optional[str] = None
     os_type: Optional[str] = None
     os_version: Optional[str] = None
     script_downloaded_at: Optional[datetime] = None

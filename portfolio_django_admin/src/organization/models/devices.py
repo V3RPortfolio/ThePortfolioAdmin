@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 
-from organization.constants import DeviceType, DeviceDataType, OsType
+from organization.constants import DeviceType, DeviceDataType, OsType, OsVersion
 from .organization import Organization
 
 # Create your models here.
@@ -19,10 +19,13 @@ class Device(models.Model):
     os_type = models.CharField(
         max_length=50,
         choices=[(os.value, os.name) for os in OsType],
-        blank=True,
-        null=True,
+        default=OsType.UBUNTU.value
     )
-    os_version = models.CharField(max_length=50, blank=True, null=True)
+    os_version = models.CharField(
+        max_length=50, 
+        choices=[(version.value, version.name) for version in OsVersion],
+        default=OsVersion.UBUNTU_24.value
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

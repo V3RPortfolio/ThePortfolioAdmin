@@ -3,6 +3,7 @@ import httpx
 
 from django.db.models import QuerySet
 from organization.models import Device, DeviceConfiguration
+from organization.schemas import ResourceIndexDto
 import portfolio_django_admin.constants as constants
 from authentication.services.auth import create_device_access_token
 
@@ -34,18 +35,6 @@ async def add_device(
         os_type=os_type,
         os_version=os_version,
     )
-
-    try:
-        api_key = create_device_access_token(
-            device_id=str(device.id),
-            organization_id=str(org_id),
-            device_type=device_type,
-            elastic_indices=[],
-        )
-        device.api_key = api_key
-        await device.asave(update_fields=["api_key"])
-    except Exception as e:
-        logger.error("Failed to generate API key for device %s: %s", device.id, e)
 
     return device, None
 
@@ -135,21 +124,6 @@ async def add_device_configuration(
         data_type=data_type,
     )
 
-    try:
-        elastic_indices = [
-            data_type async for data_type in DeviceConfiguration.objects.filter(device=device).values_list('data_type', flat=True)
-        ]
-        api_key = create_device_access_token(
-            device_id=str(device.id),
-            organization_id=str(org_id),
-            device_type=device.device_type,
-            elastic_indices=elastic_indices,
-        )
-        device.api_key = api_key
-        await device.asave(update_fields=["api_key"])
-    except Exception as e:
-        logger.error("Failed to regenerate API key for device %s after adding configuration: %s", device.id, e)
-
     return config, None
 
 
@@ -176,6 +150,30 @@ async def get_device_connection_status(
     except Device.DoesNotExist:
         return None
 
+async def generate_device_access_token(
+    device_id: UUID,
+    organization_id: UUID,
+    resources:list[ResourceIndexDto]
+)->tuple[Optional[str], Optional[str]]:
+    try:
+        device = await Device.objects.aget(id=device_id, organization__id=organization_id)
+
+        api_key = create_device_access_token(
+            device_id=str(device.id),
+            organization_id=str(organization_id),
+            device_type=device.device_type,
+            elastic_indices=[resource.model_dump() for resource in resources],
+            os_type=device.os_type,
+            os_version=device.os_version,
+        )
+        device.api_key = api_key
+        await device.asave(update_fields=["api_key"])
+        return api_key, None
+    except Exception as e:
+        logger.error("Failed to generate API key for device %s: %s", device.id, e)
+        return None, "Failed to generate access token for the device."
+    except Device.DoesNotExist:
+        return None, "Device not found."
 
 async def download_device_installation_script(
     org_id: UUID,
@@ -203,26 +201,28 @@ async def download_device_installation_script(
         "api_key": jwt_token,
     }
 
-    try:
-        async with httpx.AsyncClient(base_url=constants.ORGANIZATION_SERVICE_URL) as client:
-            response = await client.post(
-                f"/organization/{org_id}/installation",
-                json=payload,
-            )
-            response.raise_for_status()
-            file_content = response.content
-    except httpx.HTTPStatusError as e:
-        logger.error(
-            "Organization service returned an error for device installation script (org=%s, device=%s): %s",
-            org_id, device_name, e,
-        )
-        return None, "Failed to retrieve installation script from the organization service."
-    except Exception as e:
-        logger.error(
-            "Unexpected error while downloading installation script (org=%s, device=%s): %s",
-            org_id, device_name, e,
-        )
-        return None, "An unexpected error occurred while downloading the installation script."
+    # try:
+    #     async with httpx.AsyncClient(base_url=constants.ORGANIZATION_SERVICE_URL) as client:
+    #         response = await client.post(
+    #             f"/organization/{org_id}/installation",
+    #             json=payload,
+    #         )
+    #         response.raise_for_status()
+    #         file_content = response.content
+    # except httpx.HTTPStatusError as e:
+    #     logger.error(
+    #         "Organization service returned an error for device installation script (org=%s, device=%s): %s",
+    #         org_id, device_name, e,
+    #     )
+    #     return None, "Failed to retrieve installation script from the organization service."
+    # except Exception as e:
+    #     logger.error(
+    #         "Unexpected error while downloading installation script (org=%s, device=%s): %s",
+    #         org_id, device_name, e,
+    #     )
+    #     return None, "An unexpected error occurred while downloading the installation script."
+
+    file_content = b"#!/bin/bash\necho 'This is a placeholder installation script.'\n"
 
     try:
         device.script_downloaded_at = datetime.now(timezone.utc)
