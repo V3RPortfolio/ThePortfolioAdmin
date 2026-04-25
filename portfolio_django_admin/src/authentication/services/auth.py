@@ -2,7 +2,8 @@ from ninja.security import HttpBearer
 from jose import JWTError, jwt
 from django.conf import settings
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
+import json
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from authentication.models import UserRole
@@ -100,3 +101,36 @@ def verify_refresh_token(refresh_token: str) -> Optional[dict]:
         return payload
     except JWTError:
         return None
+
+
+def create_device_access_token(
+    device_id: str,
+    organization_id: str,
+    device_type: str,
+    elastic_indices: List[dict],
+    os_type: Optional[str]=None,
+    os_version: Optional[str]=None,
+) -> str:
+    """
+    Generate a non-expiring JWT access token for a device.
+
+    The token payload contains:
+    - sub: device ID
+    - organization_id: the organization the device belongs to
+    - device_type: the type of device
+    - elastic_indices: JSON-encoded list of Elastic Indices configured for the device
+    - os_type: (optional) operating system type
+    - os_version: (optional) operating system versions
+    """
+    payload = {
+        "sub": device_id,
+        "organization_id": organization_id,
+        "device_type": device_type,
+        "resources": json.dumps(elastic_indices),
+    }
+    if os_type:
+        payload["os_type"] = os_type
+    if os_version:
+        payload["os_version"] = os_version
+
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)

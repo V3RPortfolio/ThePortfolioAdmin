@@ -15,9 +15,13 @@ Available Routes:
 3. Check Connection Status
 """
 
+import logging
+
 from ninja import Router
 from typing import List
 from uuid import UUID
+from django.http import HttpResponse
+
 from organization.schemas import (
     DeviceIn,
     DeviceUpdate,
@@ -38,6 +42,9 @@ from organization.services import (
     add_device_configuration,
     remove_device_configuration,
     get_device_connection_status,
+    generate_device_access_token,
+    download_device_installation_script,
+    ResourceService
 )
 from authentication.constants import (
     ORG_ADMIN_ROLES,
@@ -47,6 +54,16 @@ from authentication.services import AuthBearer
 from organization.decorators import require_org_roles
 
 router = Router(tags=["Devices"], auth=AuthBearer())
+
+logger = logging.getLogger(__name__)
+
+
+def _get_jwt_token(request) -> str:
+    """Extract the raw JWT token from the Authorization header."""
+    auth_header:str|None = request.META.get("HTTP_AUTHORIZATION", "")
+    if not auth_header:
+        return ""
+    return auth_header.removeprefix("Bearer ").removeprefix("bearer").strip()
 
 
 # ---------------------------------------------------------------------------
@@ -65,6 +82,8 @@ async def add_device_endpoint(request, org_id: UUID, payload: DeviceIn):
         device_type=payload.device_type.value,
         description=payload.description,
         updated_by=request.auth["sub"],
+        os_type=payload.os_type.value if payload.os_type else None,
+        os_version=payload.os_version.value if payload.os_version else None,
     )
     if error:
         return 409, {"message": error}
@@ -79,6 +98,10 @@ async def add_device_endpoint(request, org_id: UUID, payload: DeviceIn):
         created_at=device.created_at,
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
+        os_type=device.os_type,
+        os_version=device.os_version,
+        script_downloaded_at=device.script_downloaded_at,
+        script_downloaded_by=device.script_downloaded_by,
     )
 
 @router.put(
@@ -92,6 +115,8 @@ async def update_device_endpoint(request, org_id: UUID, device_id: UUID, payload
         device_id=device_id,
         name=payload.name,
         description=payload.description,
+        os_type=payload.os_type.value if payload.os_type else None,
+        os_version=payload.os_version.value if payload.os_version else None,
     )
 
     if error:
@@ -106,6 +131,10 @@ async def update_device_endpoint(request, org_id: UUID, device_id: UUID, payload
         created_at=device.created_at,
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
+        os_type=device.os_type,
+        os_version=device.os_version,
+        script_downloaded_at=device.script_downloaded_at,
+        script_downloaded_by=device.script_downloaded_by,
     )
 
 @router.get(
@@ -126,6 +155,10 @@ async def list_devices_endpoint(request, org_id: UUID):
             created_at=device.created_at,
             updated_at=device.updated_at,
             last_heartbeat_at=device.last_heartbeat_at,
+            os_type=device.os_type,
+            os_version=device.os_version,
+            script_downloaded_at=device.script_downloaded_at,
+            script_downloaded_by=device.script_downloaded_by,
         )
         async for device in devices
     ]
@@ -162,6 +195,10 @@ async def get_device_details_endpoint(request, org_id: UUID, device_id: UUID):
         created_at=device.created_at,
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
+        os_type=device.os_type,
+        os_version=device.os_version,
+        script_downloaded_at=device.script_downloaded_at,
+        script_downloaded_by=device.script_downloaded_by,
         configurations=configurations,
     )
 
@@ -186,6 +223,10 @@ async def deactivate_device_endpoint(request, org_id: UUID, device_id: UUID):
         created_at=device.created_at,
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
+        os_type=device.os_type,
+        os_version=device.os_version,
+        script_downloaded_at=device.script_downloaded_at,
+        script_downloaded_by=device.script_downloaded_by,
     )
 
 
@@ -265,15 +306,49 @@ async def check_connection_status_endpoint(request, org_id: UUID, device_id: UUI
 
 @router.get(
     "/{org_id}/{device_id}/download",
-    response={200: dict, 403: ErrorMessage, 404: ErrorMessage},
+    response={400: ErrorMessage, 403: ErrorMessage, 404: ErrorMessage},
 )
 @require_org_roles(ORG_ADMIN_ROLES)
 async def download_installation_file_endpoint(request, org_id: UUID, device_id: UUID):
-    device = await get_device_connection_status(org_id, device_id)
+    device = await get_device_details(org_id, device_id)
     if not device:
         return 404, {"message": "Device not found"}
 
-    return 200, {
-        "message": "Installation file download is not yet available.",
-        "device_id": str(device.id),
-    }
+    if not device.api_key:       
+        logger.info("No API key found for device %s. Generating new access token.", device_id)
+        user_token = _get_jwt_token(request)
+        if not user_token or len(user_token) == 0:
+            return 403, {"message": "Authorization token is missing or invalid."}
+        
+        try:
+            async with ResourceService(jwt_token=user_token) as resource_service:
+                resource = await resource_service.get_organization(str(org_id))
+                if not resource or not resource.indices or len(resource.indices) == 0:
+                    return 404, {"message": "Organization resources not found. Please make sure you provisioned the resource"}
+        except Exception as e:
+            logger.error("Failed to retrieve organization resources for org %s: %s", org_id, e)
+            return 400, {"message": "Failed to retrieve organization resources."}
+        
+
+
+        token, error = await generate_device_access_token(
+            device_id=device.id,
+            organization_id=org_id,
+            resources=resource.indices
+        )
+    else:
+        token = device.api_key
+
+    file_content, error = await download_device_installation_script(
+        org_id=org_id,
+        device_name=device.name,
+        jwt_token=token,
+        downloaded_by=request.auth["sub"] if request.auth and "sub" in request.auth else None,
+    )
+    if error:
+        logger.error("Failed to download installation script for device %s in org %s: %s", device_id, org_id, error)
+        return 400, {"message": error}
+
+    response = HttpResponse(content=file_content, content_type="application/octet-stream")
+    response["Content-Disposition"] = f'attachment; filename="{device.name}_installer"'
+    return response
