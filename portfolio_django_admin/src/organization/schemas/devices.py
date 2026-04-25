@@ -20,6 +20,9 @@ class DeviceConfigurationOut(Schema):
     id: UUID
     device_id: UUID
     data_type: str
+    organization_id: Optional[UUID] = None
+    api_key: Optional[str] = None
+    configured_by: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 class DeviceOut(Schema):

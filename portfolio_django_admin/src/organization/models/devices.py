@@ -39,6 +39,11 @@ class DeviceConfiguration(models.Model):
         null=False
     )
 
+    # Stored here for direct access without traversing the Device FK relationship.
+    organization_id = models.UUIDField(null=True, blank=True)
+    api_key = models.TextField(null=True, blank=True)
+    configured_by = models.CharField(max_length=255, null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

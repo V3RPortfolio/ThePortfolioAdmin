@@ -146,6 +146,9 @@ async def get_device_details_endpoint(request, org_id: UUID, device_id: UUID):
             id=config.id,
             device_id=device.id,
             data_type=config.data_type,
+            organization_id=config.organization_id,
+            api_key=config.api_key,
+            configured_by=config.configured_by,
             created_at=config.created_at,
             updated_at=config.updated_at,
         )
@@ -212,7 +215,12 @@ async def remove_device_endpoint(request, org_id: UUID, device_id: UUID):
 )
 @require_org_roles(ORG_ADMIN_ROLES)
 async def add_device_configuration_endpoint(request, org_id: UUID, device_id: UUID, payload: DeviceConfigurationIn):
-    config, error = await add_device_configuration(org_id, device_id, payload.data_type.value)
+    config, error = await add_device_configuration(
+        org_id,
+        device_id,
+        payload.data_type.value,
+        configured_by=request.auth["sub"],
+    )
     if error:
         return 409 if "already exists" in error else 404, {"message": error}
 
@@ -220,6 +228,9 @@ async def add_device_configuration_endpoint(request, org_id: UUID, device_id: UU
         id=config.id,
         device_id=device_id,
         data_type=config.data_type,
+        organization_id=config.organization_id,
+        api_key=config.api_key,
+        configured_by=config.configured_by,
         created_at=config.created_at,
         updated_at=config.updated_at
     )

@@ -4,6 +4,10 @@ from organization.models import Device, DeviceConfiguration
 from typing import Optional, Tuple
 from uuid import UUID
 from datetime import datetime, timezone
+import json
+
+from django.conf import settings
+from jose import jwt as jose_jwt
 
 
 async def add_device(
@@ -81,19 +85,42 @@ async def remove_device(org_id: UUID, device_id: UUID) -> Tuple[bool, Optional[s
 
 
 async def add_device_configuration(
-    org_id: UUID, device_id: UUID, data_type: str
+    org_id: UUID, device_id: UUID, data_type: str, configured_by: Optional[str] = None
 ) -> Tuple[Optional[DeviceConfiguration], Optional[str]]:
     try:
-        device = await Device.objects.aget(id=device_id, organization_id=org_id)
+        device = await Device.objects.prefetch_related('configurations').aget(
+            id=device_id, organization_id=org_id
+        )
     except Device.DoesNotExist:
         return None, "Device not found in this organization."
 
     if await DeviceConfiguration.objects.filter(device=device, data_type=data_type).aexists():
         return None, "This configuration already exists for the device."
 
+    existing_indices = [c.data_type for c in device.configurations.all()]
+    all_indices = existing_indices + [data_type]
+
+    # No 'exp' claim is set intentionally: this token serves as a long-lived
+    # device API key whose lifecycle is managed via DeviceConfiguration records,
+    # not token expiry.
+    token_payload = {
+        "device_id": str(device_id),
+        "organization_id": str(org_id),
+        "device_type": device.device_type,
+        "elastic_indices": json.dumps(all_indices),
+    }
+    api_key = jose_jwt.encode(
+        token_payload,
+        settings.JWT_SECRET_KEY,
+        algorithm=settings.JWT_ALGORITHM,
+    )
+
     config = await DeviceConfiguration.objects.acreate(
         device=device,
         data_type=data_type,
+        organization_id=org_id,
+        configured_by=configured_by,
+        api_key=api_key,
     )
     return config, None
 
