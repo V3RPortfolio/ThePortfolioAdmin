@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 
-from organization.constants import DeviceType, DeviceDataType
+from organization.constants import DeviceType, DeviceDataType, OsType
 from .organization import Organization
 
 # Create your models here.
@@ -15,13 +15,23 @@ class Device(models.Model):
         choices=[(device_type.value, device_type.name) for device_type in DeviceType],
         default=DeviceType.DESKTOP.value
     )
-    
+    api_key = models.TextField(blank=True, null=True)
+    os_type = models.CharField(
+        max_length=50,
+        choices=[(os.value, os.name) for os in OsType],
+        blank=True,
+        null=True,
+    )
+    os_version = models.CharField(max_length=50, blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.CharField(max_length=255, null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
     last_heartbeat_at = models.DateTimeField(null=True, blank=True)
+    script_downloaded_at = models.DateTimeField(null=True, blank=True)
+    script_downloaded_by = models.CharField(max_length=255, null=True, blank=True)
 
     configurations:list['DeviceConfiguration'] = []  # This will be populated manually in the service layer
     class Meta:

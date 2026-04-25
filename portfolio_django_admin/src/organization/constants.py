@@ -26,10 +26,19 @@ class UserInvitationStatus(str, Enum):
 
 class DeviceType(Enum):
     DESKTOP = "Desktop"
+
 class DeviceDataType(Enum):
     USER_ACCESS = "user_access"
     CPU_AND_MEMORY_USAGE = "cpu_and_memory_usage"
     IO_DEVICE_USAGE = "io_device_usage"
+
+class OsType(str, Enum):
+    WINDOWS = "Windows"
+    UBUNTU = "Ubuntu"
+
+class OsVersion(str, Enum):
+    WINDOWS_10 = "10"
+    UBUNTU_24 = "24"
     
 
 CACHE_KEY_PREFIX = "org_role_cache"

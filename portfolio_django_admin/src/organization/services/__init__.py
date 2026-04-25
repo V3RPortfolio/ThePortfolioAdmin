@@ -32,6 +32,7 @@ from .devices import (
     add_device_configuration,
     remove_device_configuration,
     get_device_connection_status,
+    download_device_installation_script,
 )
 
 __all__ = [
@@ -62,4 +63,5 @@ __all__ = [
     "add_device_configuration",
     "remove_device_configuration",
     "get_device_connection_status",
+    "download_device_installation_script",
 ]
