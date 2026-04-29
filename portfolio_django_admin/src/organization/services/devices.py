@@ -193,19 +193,11 @@ async def download_device_installation_script(
     except Device.DoesNotExist:
         return None, "Device not found in this organization."
 
-    payload = {
-        "device_name": device_name,
-        "device_type": device.device_type,
-        "os_type": device.os_type,
-        "os_version": device.os_version,
-        "api_key": jwt_token,
-    }
-
     try:
         async with httpx.AsyncClient(base_url=constants.ORGANIZATION_SERVICE_URL) as client:
-            response = await client.post(
-                f"/organization/{org_id}/download/v1",
-                json=payload,
+            response = await client.get(
+                f"/organization/{org_id}/download/v1?operating_system={device.os_type}&os_version={device.os_version}&software_version=latest",
+                headers={"Authorization": f"Bearer {jwt_token}"},
             )
             response.raise_for_status()
             file_content = response.content
