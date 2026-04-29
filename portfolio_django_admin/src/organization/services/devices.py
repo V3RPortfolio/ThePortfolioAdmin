@@ -201,36 +201,36 @@ async def download_device_installation_script(
         "api_key": jwt_token,
     }
 
-    # try:
-    #     async with httpx.AsyncClient(base_url=constants.ORGANIZATION_SERVICE_URL) as client:
-    #         response = await client.post(
-    #             f"/organization/{org_id}/installation",
-    #             json=payload,
-    #         )
-    #         response.raise_for_status()
-    #         file_content = response.content
-    # except httpx.HTTPStatusError as e:
-    #     logger.error(
-    #         "Organization service returned an error for device installation script (org=%s, device=%s): %s",
-    #         org_id, device_name, e,
-    #     )
-    #     return None, "Failed to retrieve installation script from the organization service."
-    # except Exception as e:
-    #     logger.error(
-    #         "Unexpected error while downloading installation script (org=%s, device=%s): %s",
-    #         org_id, device_name, e,
-    #     )
-    #     return None, "An unexpected error occurred while downloading the installation script."
-
-    file_content = b"#!/bin/bash\necho 'This is a placeholder installation script.'\n"
-
     try:
-        device.script_downloaded_at = datetime.now(timezone.utc)
-        device.script_downloaded_by = downloaded_by
-        await device.asave(update_fields=["script_downloaded_at", "script_downloaded_by"])
+        async with httpx.AsyncClient(base_url=constants.ORGANIZATION_SERVICE_URL) as client:
+            response = await client.post(
+                f"/organization/{org_id}/download/v1",
+                json=payload,
+            )
+            response.raise_for_status()
+            file_content = response.content
+    except httpx.HTTPStatusError as e:
+        logger.error(
+            "Organization service returned an error for device installation script (org=%s, device=%s): %s",
+            org_id, device_name, e,
+        )
+        return None, "Failed to retrieve installation script from the organization service."
     except Exception as e:
         logger.error(
-            "Failed to update script download metadata for device %s: %s", device.id, e
+            "Unexpected error while downloading installation script (org=%s, device=%s): %s",
+            org_id, device_name, e,
         )
+        return None, "An unexpected error occurred while downloading the installation script."
+
+    # file_content = b"#!/bin/bash\necho 'This is a placeholder installation script.'\n"
+
+    # try:
+    #     device.script_downloaded_at = datetime.now(timezone.utc)
+    #     device.script_downloaded_by = downloaded_by
+    #     await device.asave(update_fields=["script_downloaded_at", "script_downloaded_by"])
+    # except Exception as e:
+    #     logger.error(
+    #         "Failed to update script download metadata for device %s: %s", device.id, e
+    #     )
 
     return file_content, None
