@@ -342,7 +342,7 @@ async def download_installation_file_endpoint(request, org_id: UUID, device_id: 
     file_content, error = await download_device_installation_script(
         org_id=org_id,
         device_name=device.name,
-        jwt_token=token,
+        jwt_token=user_token,
         downloaded_by=request.auth["sub"] if request.auth and "sub" in request.auth else None,
     )
     if error:
