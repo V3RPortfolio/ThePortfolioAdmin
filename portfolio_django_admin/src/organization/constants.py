@@ -38,6 +38,7 @@ class OsType(str, Enum):
 
 class OsVersion(str, Enum):
     WINDOWS_10 = "10"
+    WINDOWS_11 = "11"
     UBUNTU_24 = "24"
     UBUNTU_22 = "22"
     
