@@ -30,6 +30,7 @@ from organization.schemas import (
     DeviceConfigurationIn,
     DeviceConfigurationOut,
     DeviceConnectionStatusOut,
+    DeviceInstallationDetailsOut,
     ErrorMessage,
 )
 from organization.services import (
@@ -43,7 +44,6 @@ from organization.services import (
     remove_device_configuration,
     get_device_connection_status,
     generate_device_access_token,
-    download_device_installation_script,
     ResourceService
 )
 from authentication.constants import (
@@ -305,21 +305,21 @@ async def check_connection_status_endpoint(request, org_id: UUID, device_id: UUI
 # ---------------------------------------------------------------------------
 
 @router.get(
-    "/{org_id}/{device_id}/download",
-    response={400: ErrorMessage, 403: ErrorMessage, 404: ErrorMessage},
+    "/{org_id}/{device_id}/installation-details",
+    response={400: ErrorMessage, 403: ErrorMessage, 404: ErrorMessage, 200:DeviceInstallationDetailsOut},
 )
-@require_org_roles(ORG_ADMIN_ROLES)
-async def download_installation_file_endpoint(request, org_id: UUID, device_id: UUID):
+@require_org_roles(list(OrganizationRoleType))
+async def fetch_installation_details(request, org_id: UUID, device_id: UUID):
     device = await get_device_details(org_id, device_id)
     if not device:
         return 404, {"message": "Device not found"}
+    
+    user_token = _get_jwt_token(request)
+    if not user_token or len(user_token) == 0:
+        return 403, {"message": "Authorization token is missing or invalid."}
 
     if not device.api_key:       
-        logger.info("No API key found for device %s. Generating new access token.", device_id)
-        user_token = _get_jwt_token(request)
-        if not user_token or len(user_token) == 0:
-            return 403, {"message": "Authorization token is missing or invalid."}
-        
+        logger.info("No API key found for device %s. Generating new access token.", device_id)        
         try:
             async with ResourceService(jwt_token=user_token) as resource_service:
                 resource = await resource_service.get_organization(str(org_id))
@@ -336,19 +336,14 @@ async def download_installation_file_endpoint(request, org_id: UUID, device_id: 
             organization_id=org_id,
             resources=resource.indices
         )
+        if error:
+            logger.error("Failed to generate access token for device %s: %s", device_id, error)
+            return 400, {"message": "Failed to generate access token for the device."}
     else:
         token = device.api_key
 
-    file_content, error = await download_device_installation_script(
-        org_id=org_id,
-        device_name=device.name,
-        jwt_token=user_token,
-        downloaded_by=request.auth["sub"] if request.auth and "sub" in request.auth else None,
+    return DeviceInstallationDetailsOut(
+        api_key=token,
+        organization_id=org_id,
+        device_id=device.id
     )
-    if error:
-        logger.error("Failed to download installation script for device %s in org %s: %s", device_id, org_id, error)
-        return 400, {"message": error}
-
-    response = HttpResponse(content=file_content, content_type="application/octet-stream")
-    response["Content-Disposition"] = f'attachment; filename="{device.name}_installer"'
-    return response

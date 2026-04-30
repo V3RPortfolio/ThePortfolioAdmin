@@ -20,6 +20,7 @@ from .devices import (
     DeviceConfigurationIn,
     DeviceConfigurationOut,
     DeviceConnectionStatusOut,
+    DeviceInstallationDetailsOut
 )
 
 from .resources import (
@@ -47,6 +48,7 @@ __all__ = [
     "DeviceConfigurationIn",
     "DeviceConfigurationOut",
     "DeviceConnectionStatusOut",
+    "DeviceInstallationDetailsOut",
     "ManageResourceDto",
     "ResourceIndexDto",
     "ResourceDto",

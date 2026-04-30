@@ -33,7 +33,6 @@ from .devices import (
     remove_device_configuration,
     get_device_connection_status,
     generate_device_access_token,
-    download_device_installation_script,
 )
 
 from .resources import ResourceService
@@ -67,7 +66,6 @@ __all__ = [
     "remove_device_configuration",
     "get_device_connection_status",
     "generate_device_access_token",
-    "download_device_installation_script",
 
     "ResourceService",
 ]

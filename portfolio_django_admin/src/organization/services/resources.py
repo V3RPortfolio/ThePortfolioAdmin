@@ -13,7 +13,7 @@ class ResourceService:
     """
 
     def __init__(self, jwt_token: str):
-        self.base_url = constants.ORGANIZATION_SERVICE_URL
+        self.base_url = constants.JARVIS_GATEWAY_URL
         self.jwt_token = jwt_token
         self._client: Optional[httpx.AsyncClient] = None
 

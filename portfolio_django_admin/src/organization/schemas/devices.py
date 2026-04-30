@@ -57,3 +57,8 @@ class DeviceConnectionStatusOut(Schema):
     device_id: UUID
     is_active: bool
     last_heartbeat_at: Optional[datetime] = None
+
+class DeviceInstallationDetailsOut(Schema):
+    api_key: str
+    organization_id: UUID
+    device_id: UUID

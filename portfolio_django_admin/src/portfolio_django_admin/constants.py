@@ -10,4 +10,4 @@ GITHUB_REPOSITORY_ADMIN = "ThePortfolioAdmin"
 GITHUB_REPOSITORY_TOKEN = os.getenv("GITHUB_PAT", "")
 
 # Organization Service configurations
-ORGANIZATION_SERVICE_URL = os.getenv("ORGANIZATION_SERVICE_URL", "http://localhost:8001")
+JARVIS_GATEWAY_URL = os.getenv("JARVIS_GATEWAY_URL", "http://localhost:8001")

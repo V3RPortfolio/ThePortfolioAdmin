@@ -39,6 +39,7 @@ class OsType(str, Enum):
 class OsVersion(str, Enum):
     WINDOWS_10 = "10"
     UBUNTU_24 = "24"
+    UBUNTU_22 = "22"
     
 
 CACHE_KEY_PREFIX = "org_role_cache"
