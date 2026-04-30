@@ -44,6 +44,7 @@ from organization.services import (
     remove_device_configuration,
     get_device_connection_status,
     generate_device_access_token,
+    get_organization,
     ResourceService
 )
 from authentication.constants import (
@@ -306,7 +307,7 @@ async def check_connection_status_endpoint(request, org_id: UUID, device_id: UUI
 
 @router.get(
     "/{org_id}/{device_id}/installation-details",
-    response={400: ErrorMessage, 403: ErrorMessage, 404: ErrorMessage, 200:DeviceInstallationDetailsOut},
+    response={400: ErrorMessage, 403: ErrorMessage, 404: ErrorMessage, 200:DeviceInstallationDetailsOut, 402: DeviceInstallationDetailsOut},
 )
 @require_org_roles(list(OrganizationRoleType))
 async def fetch_installation_details(request, org_id: UUID, device_id: UUID):
@@ -317,6 +318,18 @@ async def fetch_installation_details(request, org_id: UUID, device_id: UUID):
     user_token = _get_jwt_token(request)
     if not user_token or len(user_token) == 0:
         return 403, {"message": "Authorization token is missing or invalid."}
+    
+    organization = await get_organization(org_id)
+    if not organization:
+        return 404, {"message": "Organization not found"}
+    
+    if not organization.last_paid_at:
+        return 402, DeviceInstallationDetailsOut(
+            api_key="N/A",
+            organization_id=org_id,
+            device_id=device.id,
+            message="Your current subscription does not allow downloading the installation script. Please upgrade your subscription to access this feature. Contact zuhairmhtb@gmail.com for further details."
+        )
 
     if not device.api_key:       
         logger.info("No API key found for device %s. Generating new access token.", device_id)        
