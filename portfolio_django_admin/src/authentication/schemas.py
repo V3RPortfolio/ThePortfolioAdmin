@@ -34,3 +34,8 @@ class GoogleOauth2Info(Schema):
     given_name: Optional[str] = None
     family_name: Optional[str] = None
     email_verified: Optional[bool] = None
+
+class DecodedToken(Schema):
+    sub: str
+    organization_id: Optional[str] = None
+    resources: Optional[list[dict]] = None

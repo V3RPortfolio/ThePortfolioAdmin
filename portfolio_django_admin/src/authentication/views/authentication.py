@@ -1,7 +1,8 @@
+import json
 from ninja import Router
 from django.contrib.auth import authenticate
-from authentication.schemas import TokenPayload, AuthResponse, ErrorMessage, RefreshTokenPayload
-from authentication.services import create_access_token, create_refresh_token, verify_refresh_token
+from authentication.schemas import TokenPayload, AuthResponse, ErrorMessage, RefreshTokenPayload, DecodedToken
+from authentication.services import create_access_token, create_refresh_token, verify_refresh_token, decode_token
 from datetime import timedelta
 from django.conf import settings
 from asgiref.sync import sync_to_async
@@ -51,3 +52,12 @@ async def refresh_token(request, payload: RefreshTokenPayload):
         "access_token": access_token,
         "refresh_token": refresh_token
     }
+
+
+@router.get("/me", response={200: DecodedToken, 401: ErrorMessage})
+async def get_token_info(request):
+    return 200, DecodedToken(
+        sub=request.auth["sub"],
+        organization_id=request.auth.get("organization_id", ""),
+        resources=json.loads(request.auth.get("resources", "[]"))
+    )
