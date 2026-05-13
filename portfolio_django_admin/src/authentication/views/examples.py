@@ -6,9 +6,9 @@ from authentication.constants import RoleType
 router = Router(tags=["Examples"])
 
 
-@router.get("/me", response={200: dict, 401: ErrorMessage})
-async def me(request):
-    return {"username": request.auth["sub"]}
+# @router.get("/me", response={200: dict, 401: ErrorMessage})
+# async def me(request):
+#     return {"username": request.auth["sub"]}
 
 # Example protected endpoint
 @router.get("/protected", response={200: dict, 401: ErrorMessage})
