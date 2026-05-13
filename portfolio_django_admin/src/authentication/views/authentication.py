@@ -58,6 +58,6 @@ async def refresh_token(request, payload: RefreshTokenPayload):
 async def get_token_info(request):
     return 200, DecodedToken(
         sub=request.auth["sub"],
-        organization_id=request.auth.get("organization_id"),
+        organization_id=request.auth.get("organization_id", ""),
         resources=json.loads(request.auth.get("resources", "[]"))
     )
