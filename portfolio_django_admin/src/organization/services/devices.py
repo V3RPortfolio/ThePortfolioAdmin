@@ -162,7 +162,7 @@ async def generate_device_access_token(
             device_id=str(device.id),
             organization_id=str(organization_id),
             device_type=device.device_type,
-            elastic_indices=[resource.model_dump() for resource in resources],
+            elastic_indices=[{ "index": resource.name, "version": f"{resource.major_version}.{resource.minor_version}.{resource.patch_version}" } for resource in resources],
             os_type=device.os_type,
             os_version=device.os_version,
         )
