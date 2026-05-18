@@ -159,7 +159,7 @@ async def generate_device_access_token(
         device = await Device.objects.aget(id=device_id, organization__id=organization_id)
 
         api_key = create_device_access_token(
-            device_id=str(device.id),
+            device_id=str(device.name),
             organization_id=str(organization_id),
             device_type=device.device_type,
             elastic_indices=[{ "index": resource.name, "version": f"{resource.major_version}.{resource.minor_version}.{resource.patch_version}" } for resource in resources],
