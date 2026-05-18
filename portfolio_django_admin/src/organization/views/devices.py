@@ -332,29 +332,26 @@ async def fetch_installation_details(request, org_id: UUID, device_id: UUID):
             message="Your current subscription does not allow downloading the installation script. Please upgrade your subscription to access this feature. Contact zuhairmhtb@gmail.com for further details."
         )
 
-    if not device.api_key:       
-        logger.info("No API key found for device %s. Generating new access token.", device_id)        
-        try:
-            async with ResourceService(jwt_token=user_token) as resource_service:
-                resource = await resource_service.get_organization(str(org_id))
-                if not resource or not resource.indices or len(resource.indices) == 0:
-                    return 404, {"message": "Organization resources not found. Please make sure you provisioned the resource"}
-        except Exception as e:
-            logger.error("Failed to retrieve organization resources for org %s: %s", org_id, e)
-            return 400, {"message": "Failed to retrieve organization resources."}
-        
+    logger.info("No API key found for device %s. Generating new access token.", device_id)        
+    try:
+        async with ResourceService(jwt_token=user_token) as resource_service:
+            resource = await resource_service.get_organization(str(org_id))
+            if not resource or not resource.indices or len(resource.indices) == 0:
+                return 404, {"message": "Organization resources not found. Please make sure you provisioned the resource"}
+    except Exception as e:
+        logger.error("Failed to retrieve organization resources for org %s: %s", org_id, e)
+        return 400, {"message": "Failed to retrieve organization resources."}
+    
 
 
-        token, error = await generate_device_access_token(
-            device_id=device.id,
-            organization_id=org_id,
-            resources=resource.indices
-        )
-        if error:
-            logger.error("Failed to generate access token for device %s: %s", device_id, error)
-            return 400, {"message": "Failed to generate access token for the device."}
-    else:
-        token = device.api_key
+    token, error = await generate_device_access_token(
+        device_id=device.id,
+        organization_id=org_id,
+        resources=resource.indices
+    )
+    if error:
+        logger.error("Failed to generate access token for device %s: %s", device_id, error)
+        return 400, {"message": "Failed to generate access token for the device."}
 
     return DeviceInstallationDetailsOut(
         api_key=token,
