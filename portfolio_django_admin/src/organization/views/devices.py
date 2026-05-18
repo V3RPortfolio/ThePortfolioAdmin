@@ -327,7 +327,8 @@ async def fetch_installation_details(request, org_id: UUID, device_id: UUID):
         return 402, DeviceInstallationDetailsOut(
             api_key="N/A",
             organization_id=org_id,
-            device_id=device.name,
+            device_id=device.id,
+            device_name=device.name,
             message="Your current subscription does not allow downloading the installation script. Please upgrade your subscription to access this feature. Contact zuhairmhtb@gmail.com for further details."
         )
 
@@ -358,5 +359,6 @@ async def fetch_installation_details(request, org_id: UUID, device_id: UUID):
     return DeviceInstallationDetailsOut(
         api_key=token,
         organization_id=org_id,
-        device_id=device.name
+        device_id=device.id,
+        device_name=device.name,
     )

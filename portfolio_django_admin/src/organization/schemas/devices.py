@@ -62,4 +62,5 @@ class DeviceInstallationDetailsOut(Schema):
     api_key: str
     organization_id: UUID
     device_id: UUID
+    device_name: str
     message: Optional[str] = None
