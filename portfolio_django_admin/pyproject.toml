@@ -25,6 +25,7 @@ dependencies = [
     "distro==1.9.0",
     "django==5.1",
     "django-appconf==1.0.6",
+    "django-celery-beat>=2.7.0",
     "django-ckeditor==6.7.1",
     "django-compressor==4.5.1",
     "django-cors-headers==4.6.0",

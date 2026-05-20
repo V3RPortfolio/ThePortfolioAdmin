@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     
     'django.contrib.staticfiles',
     'corsheaders',
+    'django_celery_beat',
     
     'portfolio_django_admin',
     'github',

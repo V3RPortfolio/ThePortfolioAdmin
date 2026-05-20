@@ -1,4 +1,3 @@
-from .process_invitation import process_invitation
-from .update_device_heartbeat import update_device_heartbeat
+from .manage_device_connections import manage_device_connections
 
-__all__ = ["process_invitation", "update_device_heartbeat"]
+__all__ = ['manage_device_connections']

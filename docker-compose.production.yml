@@ -29,6 +29,24 @@ services:
     volumes:
       - ./portfolio_django_admin/src:/usr/local/app/src
     command: uv run celery -A portfolio_django_admin.celery worker --concurrency=1 --loglevel=info
+    restart: "always"
+
+  scheduler:
+    build:
+      context: ./portfolio_django_admin
+      dockerfile: Dockerfile
+    hostname: celeryscheduler
+    container_name: celery-scheduler
+    env_file:
+      - ./.env
+    networks:
+      - platform_net
+    volumes:
+      - ./portfolio_django_admin/src:/usr/local/app/src
+    command: uv run celery -A portfolio_django_admin beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    restart: "always"
+    depends_on:
+      - celery_worker
 
 networks:
   platform_net:
