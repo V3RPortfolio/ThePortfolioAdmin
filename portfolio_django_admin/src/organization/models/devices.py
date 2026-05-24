@@ -33,6 +33,8 @@ class Device(models.Model):
     is_active = models.BooleanField(default=True)
 
     last_heartbeat_at = models.DateTimeField(null=True, blank=True)
+    last_upload_at = models.DateTimeField(null=True, blank=True)
+    last_processed_at = models.DateTimeField(null=True, blank=True)
     script_downloaded_at = models.DateTimeField(null=True, blank=True)
     script_downloaded_by = models.CharField(max_length=255, null=True, blank=True)
 

@@ -21,3 +21,39 @@ def update_device_heartbeat(organization_id: str, device_name: str):
         print(
             f"Device '{device_name}' not found in organization '{organization_id}'."
         )
+
+@shared_task
+def update_device_last_upload(organization_id: str, device_name: str):
+    try:
+        device = Device.objects.get(
+            organization_id=organization_id,
+            name=device_name
+        )
+        device.last_upload_at = timezone.now()
+        device.save(update_fields=["last_upload_at"])
+        print(
+            f"Last upload time updated for device '{device_name}' "
+            f"in organization '{organization_id}' at {device.last_upload_at}."
+        )
+    except Device.DoesNotExist:
+        print(
+            f"Device '{device_name}' not found in organization '{organization_id}'."
+        )
+
+@shared_task
+def update_device_last_processed(organization_id: str, device_name: str):
+    try:
+        device = Device.objects.get(
+            organization_id=organization_id,
+            name=device_name
+        )
+        device.last_processed_at = timezone.now()
+        device.save(update_fields=["last_processed_at"])
+        print(
+            f"Last processed time updated for device '{device_name}' "
+            f"in organization '{organization_id}' at {device.last_processed_at}."
+        )
+    except Device.DoesNotExist:
+        print(
+            f"Device '{device_name}' not found in organization '{organization_id}'."
+        )
