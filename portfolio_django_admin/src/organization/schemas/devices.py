@@ -37,6 +37,8 @@ class DeviceOut(Schema):
     created_at: datetime
     updated_at: datetime
     last_heartbeat_at: Optional[datetime] = None
+    last_upload_at: Optional[datetime] = None
+    last_processed_at: Optional[datetime] = None
     os_type: Optional[str] = None
     os_version: Optional[str] = None
     script_downloaded_at: Optional[datetime] = None
@@ -57,6 +59,8 @@ class DeviceConnectionStatusOut(Schema):
     device_id: UUID
     is_active: bool
     last_heartbeat_at: Optional[datetime] = None
+    last_upload_at: Optional[datetime] = None
+    last_processed_at: Optional[datetime] = None
 
 class DeviceInstallationDetailsOut(Schema):
     api_key: str
