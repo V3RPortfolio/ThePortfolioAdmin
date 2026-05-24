@@ -100,7 +100,7 @@ async def add_device_endpoint(request, org_id: UUID, payload: DeviceIn):
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
         last_upload_at=device.last_upload_at,
-        last_processed_at=device.last_processed_at
+        last_processed_at=device.last_processed_at,
         os_type=device.os_type,
         os_version=device.os_version,
         script_downloaded_at=device.script_downloaded_at,
@@ -135,7 +135,7 @@ async def update_device_endpoint(request, org_id: UUID, device_id: UUID, payload
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
         last_upload_at=device.last_upload_at,
-        last_processed_at=device.last_processed_at
+        last_processed_at=device.last_processed_at,
         os_type=device.os_type,
         os_version=device.os_version,
         script_downloaded_at=device.script_downloaded_at,
@@ -161,7 +161,7 @@ async def list_devices_endpoint(request, org_id: UUID):
             updated_at=device.updated_at,
             last_heartbeat_at=device.last_heartbeat_at,
             last_upload_at=device.last_upload_at,
-            last_processed_at=device.last_processed_at
+            last_processed_at=device.last_processed_at,
             os_type=device.os_type,
             os_version=device.os_version,
             script_downloaded_at=device.script_downloaded_at,
@@ -203,7 +203,7 @@ async def get_device_details_endpoint(request, org_id: UUID, device_id: UUID):
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
         last_upload_at=device.last_upload_at,
-        last_processed_at=device.last_processed_at
+        last_processed_at=device.last_processed_at,
         os_type=device.os_type,
         os_version=device.os_version,
         script_downloaded_at=device.script_downloaded_at,
@@ -233,7 +233,7 @@ async def deactivate_device_endpoint(request, org_id: UUID, device_id: UUID):
         updated_at=device.updated_at,
         last_heartbeat_at=device.last_heartbeat_at,
         last_upload_at=device.last_upload_at,
-        last_processed_at=device.last_processed_at
+        last_processed_at=device.last_processed_at,
         os_type=device.os_type,
         os_version=device.os_version,
         script_downloaded_at=device.script_downloaded_at,
