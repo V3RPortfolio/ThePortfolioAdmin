@@ -23,6 +23,7 @@ class Service(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255, blank=False, null=False)
     group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='services')
+    sequence_number = models.PositiveIntegerField(default=1)  # For ordering within a group
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
