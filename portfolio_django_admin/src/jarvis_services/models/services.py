@@ -13,6 +13,10 @@ class ServiceGroup(models.Model):
 
     class Meta:
         db_table = 'service_groups'
+
+
+    def __str__(self):
+        return f"{self.title} ({'Active' if self.is_active else 'Inactive'})"
         
 
 class Service(models.Model):
@@ -29,6 +33,9 @@ class Service(models.Model):
     class Meta:
         unique_together = ('title', 'group')
         db_table = 'services'
+
+    def __str__(self):
+        return f"{self.title} (Group: {self.group.title})"
         
 class ServiceContent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -42,3 +49,6 @@ class ServiceContent(models.Model):
 
     class Meta:
         db_table = 'service_contents'
+
+    def __str__(self):
+        return f"Content #{self.sequence_number} for Service: {self.service.title}"

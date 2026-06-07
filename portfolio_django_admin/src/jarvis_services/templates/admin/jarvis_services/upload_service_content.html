@@ -1,0 +1,76 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans "Home" %}</a>
+  &rsaquo;
+  <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo;
+  <a href="{% url 'admin:jarvis_services_service_changelist' %}">{% trans "Services" %}</a>
+  &rsaquo;
+  {% trans "Upload Service Content" %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  {% if messages %}
+    <ul class="messagelist">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <p class="help">
+    Upload one or more <strong>.md</strong> (Markdown) files that will be stored
+    as <em>ServiceContent</em> entries for the specified Service.
+    <br>
+    <strong>Rules:</strong>
+    <ul>
+      <li>The <em>ServiceGroup</em> must already exist — an error is raised otherwise.</li>
+      <li>If the <em>Service</em> does not exist it will be created automatically.</li>
+      <li>
+        If the <em>Service</em> already exists and the number of uploaded files
+        <strong>exceeds</strong> the current maximum sequence number, the new files
+        are <strong>appended</strong> (continuing the existing sequence).
+      </li>
+      <li>
+        Otherwise all existing content for that Service is <strong>deleted</strong>
+        and replaced with the newly uploaded files (sequence restarted from 1).
+      </li>
+    </ul>
+  </p>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <fieldset class="module aligned">
+      {% for field in form %}
+        <div class="form-row{% if field.errors %} errors{% endif %}">
+          {{ field.label_tag }}
+          <div>
+            {{ field }}
+            {% if field.help_text %}
+              <p class="help">{{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+              <p class="errornote">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </fieldset>
+
+    <div class="submit-row">
+      <input type="submit" value="{% trans "Upload" %}" class="default">
+      <a href="{% url 'admin:jarvis_services_service_changelist' %}" class="deletelink">
+        {% trans "Cancel" %}
+      </a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}
