@@ -77,7 +77,8 @@ INSTALLED_APPS = [
     'github',
     'authentication',
     'organization',
-    'notification'
+    'notification',
+    'jarvis_services',
     
 ]
 
