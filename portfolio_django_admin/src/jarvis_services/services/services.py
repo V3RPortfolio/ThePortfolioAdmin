@@ -18,21 +18,23 @@ def get_service(service_id: UUID) -> Optional[Service]:
         return None
     
 @sync_to_async
-def get_services_by_group(group_id: UUID) -> ServiceGroupInfoOut:
+def get_services_by_group(group_id: UUID) -> Optional[ServiceGroupInfoOut]:
     try:
         group = ServiceGroup.objects.get(id=group_id)
         group_schema = ServiceGroupInfoOut.from_orm(group)
         if not group.is_active:
-            return group_schema
-            
+            return None
+
+        group_schema.services = sorted(group_schema.services, key=lambda s: s.sequence_number)        
         return group_schema
     except ServiceGroup.DoesNotExist:
-        return []
+        return None
     
 @sync_to_async
 def get_all_service_groups() -> List[ServiceGroupInfoOut]:
     groups = ServiceGroup.objects.filter(is_active=True).all()
-    group_schemas = []
+    group_schemas:list[ServiceGroupInfoOut] = []
     for group in groups:
         group_schemas.append(ServiceGroupInfoOut.from_orm(group))
+        group_schemas[-1].services = sorted(group_schemas[-1].services, key=lambda s: s.sequence_number)
     return group_schemas

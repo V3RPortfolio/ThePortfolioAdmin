@@ -17,6 +17,7 @@ class ServiceOut(Schema):
     id: UUID
     title: str
     group: ServiceGroupOut
+    sequence_number: int
     contents: list[ServiceContentOut] = []
 
     created_at: datetime
@@ -26,6 +27,7 @@ class ServiceOut(Schema):
 class ServiceInfoOut(Schema):
     id: UUID
     title: str
+    sequence_number: int
     
 class ServiceGroupInfoOut(Schema):
     id: UUID
