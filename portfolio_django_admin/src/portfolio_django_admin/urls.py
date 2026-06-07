@@ -21,6 +21,7 @@ from authentication.urls import router as auth_api
 from authentication.services.auth import AuthBearer
 from organization.urls import router as organization_api
 from notification.urls import router as notification_api
+from jarvis_services.urls import router as services_api
 from django.conf import settings
 from ninja import NinjaAPI, Redoc, Swagger  
 
@@ -37,6 +38,7 @@ api = NinjaAPI(
 api.add_router("/auth/v1/", auth_api)
 api.add_router("/organization/v1/", organization_api)
 api.add_router("/notification/v1/", notification_api)
+api.add_router("/services/v1/", services_api)
 
 urlpatterns = [
     path('', index, name='home'),

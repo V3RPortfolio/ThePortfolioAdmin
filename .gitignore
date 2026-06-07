@@ -73,3 +73,5 @@ development/
 
 # Django
 portfolio_django_admin/src/staticfiles
+
+**/docs/ignored/**
